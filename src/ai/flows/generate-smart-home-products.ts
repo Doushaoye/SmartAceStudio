@@ -10,6 +10,8 @@
 
 import { z } from 'zod';
 import OpenAI from 'openai';
+import { generateAnalysisReport } from './generate-analysis-report';
+import { products } from '@/lib/products';
 
 const openai = new OpenAI({
   apiKey: process.env.SILICONFLOW_API_KEY,
@@ -61,20 +63,22 @@ ${input.productsJson}
 
 请根据以上信息，选择适合用户的智能家居产品。在选择时，请综合考虑用户的预算和需求。"room" 和 "reason" 字段必须使用中文。
 
-重要：你必须返回一个有效的 JSON 对象，该对象仅包含 "selectedItems" 和 "analysisReport" 两个键。不要在 JSON 对象前后添加任何其他文本、解释或 markdown 格式。
+重要：你必须返回一个有效的 JSON 对象。
+该对象可以包含 "selectedItems" 和 "analysisReport" 两个键，或者仅包含 "selectedItems" 键。
+不要在 JSON 对象前后添加任何其他文本、解释或 markdown 格式。
 
-JSON 对象结构如下:
+如果包含 "analysisReport"，其内容必须是中文的Markdown格式，并解释：
+1.  由于预算限制，哪些功能打了折扣？
+2.  如果预算允许，有哪些升级建议？
+3.  有哪些省钱的方法？
+
+JSON 对象结构示例:
 {
   "selectedItems": [
     { "product_id": "1001", "quantity": 1, "room": "客厅", "reason": "中央控制中心" }
   ],
   "analysisReport": "Markdown格式的中文分析报告..."
 }
-
-analysis_report必须是中文的Markdown格式，并解释：
-1.  由于预算限制，哪些功能打了折扣？
-2.  如果预算允许，有哪些升级建议？
-3.  有哪些省钱的方法？
 `;
 
   const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
@@ -107,13 +111,33 @@ analysis_report必须是中文的Markdown格式，并解释：
   }
 
   try {
-    // The response might be wrapped in markdown, so we need to extract the JSON part.
     const jsonMatch = content.match(/```(json)?\n?([\s\S]*?)\n?```/);
     const jsonString = jsonMatch ? jsonMatch[2] : content;
     const parsedJson = JSON.parse(jsonString);
+
+    if (!parsedJson.analysisReport) {
+        console.log("AI did not return an analysis report. Generating one separately.");
+        
+        const productMap = new Map(products.map((p) => [p.id, p]));
+        const totalCost = parsedJson.selectedItems.reduce((acc: number, item: { product_id: string, quantity: number }) => {
+            const product = productMap.get(item.product_id);
+            return acc + (product ? product.price * item.quantity : 0);
+        }, 0);
+
+        const reportResult = await generateAnalysisReport({
+            budgetLevel: input.budgetLevel,
+            selectedItems: parsedJson.selectedItems,
+            totalPrice: totalCost,
+            area: input.area,
+            layout: input.layout as any, // Cast because the enum is different
+            customNeeds: input.customNeeds,
+        });
+        parsedJson.analysisReport = reportResult.analysisReport;
+    }
+
     return GenerateSmartHomeProductsOutputSchema.parse(parsedJson);
   } catch (error) {
     console.error("Failed to parse AI response:", content, error);
-    throw new Error('AI returned invalid JSON format.');
+    throw new Error('AI returned invalid JSON format or processing failed.');
   }
 }
