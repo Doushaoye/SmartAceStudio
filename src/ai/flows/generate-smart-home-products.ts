@@ -99,6 +99,10 @@ export async function generateSmartHomeProducts(input: GenerateSmartHomeProducts
 - 如果预算是 'premium' (高级), 你可以使用 'premium' 和 'economy' 等级的产品。
 - 如果预算是 'economy' (经济), 你应该尽量只选择 'economy' 等级的产品，除非绝对必要。
 
+产品选择规则 (重要):
+- 产品库中有些产品标注了 "来源": "用户自定义"，请优先选择这些产品。
+- 如果用户自定义的产品不足以完成方案设计，你可以从产品库中选择其他产品作为补充。
+
 用户画像和核心需求 (根据用户选择的标签):
 ${tagContext || "用户未选择特定标签。"}
 
@@ -110,7 +114,7 @@ ${input.floorPlanDataUri ? `平面图: [Image Attached]` : ''}
 产品库 (你必须从此列表里选择产品，产品属性描述均为中文):
 ${input.productsJson}
 
-请根据以上所有信息，特别是用户的画像、核心需求和手写需求，并严格遵守【预算选择规则】，从提供的产品库中选择适合用户的智能家居产品。在选择时，请综合考虑用户的预算和需求。"room" 和 "reason" 字段必须使用中文。
+请根据以上所有信息，特别是用户的画像、核心需求和手写需求，并严格遵守【预算选择规则】和【产品选择规则】，从提供的产品库中选择适合用户的智能家居产品。在选择时，请综合考虑用户的预算和需求。"room" 和 "reason" 字段必须使用中文。
 
 重要：你必须返回一个有效的 JSON 对象。
 该对象可以包含 "selectedItems" 和 "analysisReport" 两个键，或者仅包含 "selectedItems" 键。

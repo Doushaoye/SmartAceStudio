@@ -31,7 +31,8 @@ export async function generateProposalAction(
           '品类': p.category,
           '价格': p.price,
           '预算等级': p.budget_level,
-          '描述': p.description
+          '描述': p.description,
+          '来源': '用户自定义' // Add a tag for custom products
         }));
         combinedProducts = [...defaultSimplifiedProducts, ...simplifiedCustomProducts];
       } catch (e) {
