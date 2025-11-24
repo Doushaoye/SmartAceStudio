@@ -35,6 +35,8 @@ export function ProposalProvider({ children }: { children: ReactNode }) {
       }
       setProposal(result.proposal);
       router.push('/result');
+      // Set loading to false after navigation and state update
+      setIsLoading(false);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : t('errors.unknown');
       setError(errorMessage);
@@ -45,7 +47,6 @@ export function ProposalProvider({ children }: { children: ReactNode }) {
       });
       setIsLoading(false);
     }
-    // Don't set isLoading to false on success, as the user will be navigated away.
   };
 
   return (
