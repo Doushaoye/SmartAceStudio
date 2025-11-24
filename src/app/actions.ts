@@ -23,6 +23,9 @@ export async function generateProposalAction(
     const customNeeds = formData.get('customNeeds') as string;
     const floorPlanFile = formData.get('floorPlan');
     
+    const householdProfile = formData.getAll('householdProfile[]') as string[];
+    const focusAreas = formData.getAll('focusAreas[]') as string[];
+    
     let floorPlanDataUri: string | undefined = undefined;
     if (floorPlanFile instanceof File && floorPlanFile.size > 0) {
       const buffer = await floorPlanFile.arrayBuffer();
@@ -34,6 +37,8 @@ export async function generateProposalAction(
       area,
       layout,
       budgetLevel,
+      householdProfile,
+      focusAreas,
       customNeeds,
       floorPlanDataUri,
       productsJson,

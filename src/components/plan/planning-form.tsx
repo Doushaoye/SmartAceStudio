@@ -12,14 +12,35 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { useProposal } from '@/context/proposal-context';
-import { DollarSign, Zap, Gem, ArrowRight, FileUp } from 'lucide-react';
+import { DollarSign, Zap, Gem, ArrowRight, FileUp, User, Heart, Baby, Accessibility, Cat } from 'lucide-react';
 import { useI18n } from '@/context/i18n-context';
 import { LoadingAnimation } from './loading-animation';
+import { cn } from '@/lib/utils';
+import { useState } from 'react';
+
+const householdProfileOptions = [
+  { label: "独居青年", value: "single", icon: User },
+  { label: "二人世界", value: "couple", icon: Heart },
+  { label: "有娃家庭", value: "kids", icon: Baby },
+  { label: "家有长辈", value: "elderly", icon: Accessibility },
+  { label: "萌宠当家", value: "pets", icon: Cat },
+];
+
+const focusAreaOptions = [
+  { label: "全屋安防", value: "security" },
+  { label: "影音娱乐", value: "entertainment" },
+  { label: "灯光氛围", value: "lighting" },
+  { label: "懒人自动", value: "automation" },
+  { label: "节能环保", value: "energy" },
+];
+
 
 const formSchema = z.object({
   area: z.coerce.number().min(1, 'Area must be at least 1 sq ft.'),
   layout: z.enum(['2r1l1b', '3r2l1b', '3r2l2b', '4r2l2b', '4r2l3b'], { required_error: 'Please select a layout.'}),
   budgetLevel: z.enum(['economy', 'premium', 'luxury'], { required_error: 'Please select a budget tier.' }),
+  householdProfile: z.array(z.string()).optional(),
+  focusAreas: z.array(z.string()).optional(),
   customNeeds: z.string().optional(),
   floorPlan: z.instanceof(File).optional(),
 });
@@ -33,6 +54,8 @@ export function PlanningForm() {
     defaultValues: {
       area: 110,
       layout: '3r2l2b',
+      householdProfile: [],
+      focusAreas: [],
       customNeeds: '',
     },
   });
@@ -43,6 +66,14 @@ export function PlanningForm() {
     formData.append('layout', values.layout);
     formData.append('budgetLevel', values.budgetLevel);
     formData.append('customNeeds', values.customNeeds || '');
+
+    (values.householdProfile || []).forEach(value => {
+        formData.append('householdProfile[]', value);
+    });
+    (values.focusAreas || []).forEach(value => {
+        formData.append('focusAreas[]', value);
+    });
+
     if (values.floorPlan) {
       formData.append('floorPlan', values.floorPlan);
     }
@@ -164,7 +195,65 @@ export function PlanningForm() {
             
             <div className="space-y-6">
                 <h3 className="font-semibold text-lg font-headline">{t('planningForm.customization.title')}</h3>
-                <div className="grid md:grid-cols-2 gap-6">
+                
+                <FormField
+                  control={form.control}
+                  name="householdProfile"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>家庭成员结构 (多选)</FormLabel>
+                      <div className="flex flex-wrap gap-2">
+                        {householdProfileOptions.map((option) => (
+                          <Button
+                            key={option.value}
+                            type="button"
+                            variant={field.value?.includes(option.value) ? 'default' : 'outline'}
+                            onClick={() => {
+                              const newValue = field.value?.includes(option.value)
+                                ? field.value.filter((v) => v !== option.value)
+                                : [...(field.value || []), option.value];
+                              field.onChange(newValue);
+                            }}
+                          >
+                            <option.icon className="mr-2 h-4 w-4" />
+                            {option.label}
+                          </Button>
+                        ))}
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="focusAreas"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>您最关注的智能体验 (多选)</FormLabel>
+                      <div className="flex flex-wrap gap-2">
+                        {focusAreaOptions.map((option) => (
+                           <Button
+                            key={option.value}
+                            type="button"
+                            variant={field.value?.includes(option.value) ? 'default' : 'outline'}
+                             onClick={() => {
+                              const newValue = field.value?.includes(option.value)
+                                ? field.value.filter((v) => v !== option.value)
+                                : [...(field.value || []), option.value];
+                              field.onChange(newValue);
+                            }}
+                          >
+                            {option.label}
+                          </Button>
+                        ))}
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="grid md:grid-cols-2 gap-6 pt-4">
                     <FormField
                       control={form.control}
                       name="floorPlan"
@@ -192,7 +281,7 @@ export function PlanningForm() {
                           <FormLabel>{t('planningForm.customization.customNeedsLabel')}</FormLabel>
                           <FormControl>
                             <Textarea
-                              placeholder={t('planningForm.customization.customNeedsPlaceholder')}
+                              placeholder="还有其他特殊需求吗？例如：'希望主卧有一个阅读模式'..."
                               className="resize-none"
                               {...field}
                               rows={4}
