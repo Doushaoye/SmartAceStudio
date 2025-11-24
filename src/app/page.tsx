@@ -9,9 +9,9 @@ import { Card, CardContent } from '@/components/ui/card';
 import { ContactSection } from '@/components/contact-section';
 
 const showcaseImages = [
-  { src: 'https://picsum.photos/seed/showcase1/600/400', hint: 'living room' },
-  { src: 'https://picsum.photos/seed/showcase2/600/400', hint: 'smart kitchen' },
-  { src: 'https://picsum.photos/seed/showcase3/600/400', hint: 'bedroom automation' },
+  { src: 'https://free.picui.cn/free/2025/11/25/6924968939d33.png', hint: 'living room' },
+  { src: 'https://free.picui.cn/free/2025/11/25/69249688a9a05.png', hint: 'smart kitchen' },
+  { src: 'https://free.picui.cn/free/2025/11/25/69249689699e5.png', hint: 'bedroom automation' },
   { src: 'https://picsum.photos/seed/showcase4/600/400', hint: 'home office' },
   { src: 'https://picsum.photos/seed/showcase5/600/400', hint: 'security camera' },
 ];
