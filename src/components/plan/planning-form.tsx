@@ -54,16 +54,14 @@ const ecosystemOptions = [
 ];
 
 const CustomProductSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  brand: z.string(),
-  category: z.string(),
-  price: z.number(),
+  name: z.string().min(1, "产品名称不能为空"),
+  brand: z.string().min(1, "品牌不能为空"),
+  category: z.string().min(1, "品类不能为空"),
+  price: z.coerce.number().min(0, "价格不能为负数"),
   budget_level: z.enum(['economy', 'premium', 'luxury']),
-  ecosystem: z.array(z.string()),
-  description: z.string(),
-  imageUrl: z.string().url().optional(),
-});
+  ecosystem: z.array(z.string()).min(1, "生态平台至少需要一个"),
+  description: z.string().min(1, "产品描述不能为空"),
+}).passthrough(); // Allow comment fields
 
 const CustomProductsStoreSchema = z.array(CustomProductSchema);
 
@@ -83,26 +81,29 @@ const formSchema = z.object({
 
 const templateJson = [
     {
-        "id": "USER-001",
+        "_comment_name": "产品名称 (必填, 字符串)",
         "name": "自定义产品A",
+        "_comment_brand": "品牌 (必填, 字符串)",
         "brand": "自定义品牌",
+        "_comment_category": "品类 (必填, 字符串, 如 '网关', '开关', '灯光' 等)",
         "category": "网关",
+        "_comment_price": "价格 (必填, 数字)",
         "price": 199,
+        "_comment_budget_level": "预算等级 (必填, 'economy', 'premium', 或 'luxury')",
         "budget_level": "economy",
+        "_comment_ecosystem": "生态平台 (必填, 数组, 可填 '米家', 'HomeKit', 'Aqara' 等)",
         "ecosystem": ["米家", "HomeKit"],
-        "description": "这是一个用户自定义的产品示例，用于家庭的中央控制。",
-        "imageUrl": "https://picsum.photos/seed/USER-001/400/400"
+        "_comment_description": "产品功能描述 (必填, 字符串, 描述产品核心功能)",
+        "description": "这是一个用户自定义的产品示例，用于家庭的中央控制。"
     },
     {
-        "id": "USER-002",
         "name": "自定义灯泡B",
         "brand": "飞利浦",
         "category": "灯光",
         "price": 88,
         "budget_level": "premium",
         "ecosystem": ["Hue"],
-        "description": "高品质彩色智能灯泡。",
-        "imageUrl": "https://picsum.photos/seed/USER-002/400/400"
+        "description": "高品质彩色智能灯泡，可调节亮度和颜色。"
     }
 ];
 
@@ -148,12 +149,21 @@ export function PlanningForm() {
           const content = e.target?.result as string;
           const parsed = JSON.parse(content);
           
-          // Validate and assign UUIDs
           const validatedProducts = CustomProductsStoreSchema.parse(parsed);
-          const productsWithIds = validatedProducts.map(p => ({
-            ...p,
-            id: `USER-${crypto.randomUUID()}`
-          }));
+
+          const productsWithIds = validatedProducts.map(p => {
+            const cleanProduct: any = {};
+            // Filter out comment fields
+            for (const key in p) {
+              if (!key.startsWith('_comment')) {
+                cleanProduct[key] = p[key as keyof typeof p];
+              }
+            }
+            return {
+              ...cleanProduct,
+              id: `USER-${crypto.randomUUID()}`
+            }
+          });
 
           form.setValue('customProductsJson', JSON.stringify(productsWithIds));
           setCustomProductsFile(file);
@@ -166,10 +176,17 @@ export function PlanningForm() {
           form.setValue('customProductsJson', '');
           setCustomProductsFile(null);
           event.target.value = ''; // Reset file input
+          
+          let errorMessage = "上传的JSON文件格式不符合要求，请检查后重试。";
+          if (error instanceof z.ZodError) {
+             const firstError = error.errors[0];
+             errorMessage = `文件格式错误: [${firstError.path.join('.')}] ${firstError.message}`;
+          }
+
           toast({
             variant: "destructive",
             title: "文件格式错误",
-            description: "上传的JSON文件格式不符合要求，请检查后重试。",
+            description: errorMessage,
           });
         }
       };
