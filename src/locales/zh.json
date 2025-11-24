@@ -2,12 +2,13 @@
     "home": {
         "title": "智能家居预算规划师",
         "subtitle": "AI 驱动，为您定制梦想之家。输入您的需求，让我们的 AI 为您的预算打造完美的智能家居计划。",
-        "ctaButton": "开始规划"
+        "ctaButton": "开始规划",
+        "contact": "联系我们"
     },
     "planningForm": {
         "title": "创建您的智能家居计划",
-        "loadingTitle": "AI 正在分析您的请求...",
-        "loadingDescription": "这可能需要一些时间。我们正在为您量身打造个性化的智能家居计划，分析平面图和您的定制需求。",
+        "loadingTitle": "AI 正在为您绘制智能家居蓝图...",
+        "loadingDescription": "我们的 AI 正在分析您的户型图、预算和定制需求，以生成个性化且高性价比的解决方案。请稍候。",
         "propertyInfo": {
             "title": "1. 房产信息",
             "areaLabel": "房产面积 (平方米)",
@@ -35,7 +36,17 @@
             "customNeedsLabel": "定制需求",
             "customNeedsPlaceholder": "例如：'家有老人，需要自动夜灯。' 或 '主要用于家庭影院体验。'"
         },
-        "submitButton": "生成方案"
+        "submitButton": "生成方案",
+        "loading": {
+            "steps": {
+                "analyzingNeeds": "正在分析您的定制需求...",
+                "evaluatingLayout": "正在评估户型布局...",
+                "selectingProducts": "正在筛选最合适的智能产品...",
+                "optimizingBudget": "正在根据预算进行优化...",
+                "generatingReport": "正在生成分析报告...",
+                "finalizing": "正在最终确定您的方案..."
+            }
+        }
     },
     "result": {
         "title": "您的智能家居蓝图",

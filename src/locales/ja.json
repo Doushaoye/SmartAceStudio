@@ -2,12 +2,13 @@
     "home": {
         "title": "スマートホーム予算プランナー",
         "subtitle": "AIがあなたの夢の家をカスタマイズ。ニーズを入力すれば、AIがあなたの予算に最適なスマートホームプランを作成します。",
-        "ctaButton": "計画を開始"
+        "ctaButton": "計画を開始",
+        "contact": "お問い合わせ"
     },
     "planningForm": {
         "title": "スマートホームプランを作成",
-        "loadingTitle": "AIがリクエストを分析中...",
-        "loadingDescription": "少々お待ちください。フロアプランとカスタムニーズを分析し、あなただけのスマートホームプランを作成しています。",
+        "loadingTitle": "AIがスマートホームの設計図を作成中...",
+        "loadingDescription": "AIが間取り図、予算、カスタムニーズを分析し、パーソナライズされたコスト効率の高いソリューションを生成しています。しばらくお待ちください。",
         "propertyInfo": {
             "title": "1. 物件情報",
             "areaLabel": "物件面積 (平方メートル)",
@@ -35,7 +36,17 @@
             "customNeedsLabel": "カスタムニーズ",
             "customNeedsPlaceholder": "例: 「高齢の親がいるので、自動夜間照明が必要です。」または「主にホームシネマ体験に焦点を当てています。」"
         },
-        "submitButton": "提案を生成"
+        "submitButton": "提案を生成",
+        "loading": {
+            "steps": {
+                "analyzingNeeds": "カスタムニーズを分析中...",
+                "evaluatingLayout": "物件のレイアウトを評価中...",
+                "selectingProducts": "最適なスマート製品を選択中...",
+                "optimizingBudget": "ご予算に合わせて最適化中...",
+                "generatingReport": "分析レポートを生成中...",
+                "finalizing": "プランを最終処理中..."
+            }
+        }
     },
     "result": {
         "title": "あなたのスマートホーム設計図",

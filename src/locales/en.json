@@ -2,12 +2,13 @@
     "home": {
         "title": "Smart Home Budget Planner",
         "subtitle": "AI-driven customization for your dream home. Input your needs, and let our AI craft the perfect smart home plan for your budget.",
-        "ctaButton": "Start Planning"
+        "ctaButton": "Start Planning",
+        "contact": "Contact Us"
     },
     "planningForm": {
         "title": "Create Your Smart Home Plan",
-        "loadingTitle": "AI is analyzing your request...",
-        "loadingDescription": "This may take a moment. We're crafting a personalized smart home plan just for you, analyzing the floor plan and your custom needs.",
+        "loadingTitle": "AI is Crafting Your Smart Home Blueprint...",
+        "loadingDescription": "Our AI is analyzing your floor plan, budget, and custom needs to generate a personalized and cost-effective solution. This might take a moment.",
         "propertyInfo": {
             "title": "1. Property Information",
             "areaLabel": "Property Area (sq ft)",
@@ -35,7 +36,17 @@
             "customNeedsLabel": "Custom Needs",
             "customNeedsPlaceholder": "e.g., 'I have elderly parents, need automated night lights.' or 'Primarily focused on home cinema experience.'"
         },
-        "submitButton": "Generate Proposal"
+        "submitButton": "Generate Proposal",
+        "loading": {
+            "steps": {
+                "analyzingNeeds": "Analyzing your custom needs...",
+                "evaluatingLayout": "Evaluating property layout...",
+                "selectingProducts": "Selecting the best smart products...",
+                "optimizingBudget": "Optimizing for your budget...",
+                "generatingReport": "Generating analysis report...",
+                "finalizing": "Finalizing your plan..."
+            }
+        }
     },
     "result": {
         "title": "Your Smart Home Blueprint",

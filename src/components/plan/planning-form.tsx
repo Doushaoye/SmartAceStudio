@@ -12,12 +12,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { useProposal } from '@/context/proposal-context';
-import { DollarSign, Zap, Gem, ArrowRight, Loader2, FileUp } from 'lucide-react';
+import { DollarSign, Zap, Gem, ArrowRight, FileUp } from 'lucide-react';
 import { useI18n } from '@/context/i18n-context';
+import { LoadingAnimation } from './loading-animation';
 
 const formSchema = z.object({
   area: z.coerce.number().min(1, 'Area must be at least 1 sq ft.'),
-  layout: z.string().min(1, 'Please select a layout.'),
+  layout: z.enum(['2r1l1b', '3r2l1b', '3r2l2b', '4r2l2b', '4r2l3b'], { required_error: 'Please select a layout.'}),
   budgetLevel: z.enum(['economy', 'premium', 'luxury'], { required_error: 'Please select a budget tier.' }),
   customNeeds: z.string().optional(),
   floorPlan: z.instanceof(File).optional(),
@@ -49,15 +50,7 @@ export function PlanningForm() {
   };
   
   if (isLoading) {
-    return (
-      <div className="flex flex-col items-center justify-center text-center py-20 gap-4">
-        <Loader2 className="h-12 w-12 animate-spin text-primary" />
-        <h2 className="text-2xl font-semibold font-headline">{t('planningForm.loadingTitle')}</h2>
-        <p className="text-muted-foreground max-w-md">
-          {t('planningForm.loadingDescription')}
-        </p>
-      </div>
-    );
+    return <LoadingAnimation />;
   }
 
   return (
@@ -100,8 +93,8 @@ export function PlanningForm() {
                           <SelectItem value="2r1l1b">{t('planningForm.propertyInfo.layoutOptions.2r1l1b')}</SelectItem>
                           <SelectItem value="3r2l1b">{t('planningForm.propertyInfo.layoutOptions.3r2l1b')}</SelectItem>
                           <SelectItem value="3r2l2b">{t('planningForm.propertyInfo.layoutOptions.3r2l2b')}</SelectItem>
-                          <SelectItem value="4r2l2b">{t['planningForm.propertyInfo.layoutOptions.4r2l2b']}</SelectItem>
-                          <SelectItem value="4r2l3b">{t['planningForm.propertyInfo.layoutOptions.4r2l3b']}</SelectItem>
+                          <SelectItem value="4r2l2b">{t('planningForm.propertyInfo.layoutOptions.4r2l2b')}</SelectItem>
+                          <SelectItem value="4r2l3b">{t('planningForm.propertyInfo.layoutOptions.4r2l3b')}</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />

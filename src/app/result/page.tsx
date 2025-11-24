@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useProposal } from '@/context/proposal-context';
 import { ResultDashboard } from '@/components/result/result-dashboard';
+import { ContactSection } from '@/components/contact-section';
 
 export default function ResultPage() {
   const { proposal, isLoading } = useProposal();
@@ -25,8 +26,11 @@ export default function ResultPage() {
   }
 
   return (
-    <div className="container py-8 md:py-12">
-      <ResultDashboard proposal={proposal} />
-    </div>
+    <>
+      <div className="container py-8 md:py-12">
+        <ResultDashboard proposal={proposal} />
+      </div>
+      <ContactSection />
+    </>
   );
 }

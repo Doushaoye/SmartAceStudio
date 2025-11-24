@@ -2,12 +2,13 @@
     "home": {
         "title": "스마트 홈 예산 플래너",
         "subtitle": "AI 기반 맞춤형으로 꿈의 집을 만드세요. 필요 사항을 입력하면 AI가 예산에 맞는 완벽한 스마트 홈 플랜을 만들어 드립니다.",
-        "ctaButton": "계획 시작하기"
+        "ctaButton": "계획 시작하기",
+        "contact": "문의하기"
     },
     "planningForm": {
         "title": "스마트 홈 계획 만들기",
-        "loadingTitle": "AI가 요청을 분석 중입니다...",
-        "loadingDescription": "잠시만 기다려 주세요. 평면도와 사용자 지정 요구 사항을 분석하여 개인화된 스마트 홈 계획을 만들고 있습니다.",
+        "loadingTitle": "AI가 스마트 홈 청사진을 만들고 있습니다...",
+        "loadingDescription": "AI가 평면도, 예산, 맞춤 요구 사항을 분석하여 개인화되고 비용 효율적인 솔루션을 생성하고 있습니다. 잠시만 기다려 주세요.",
         "propertyInfo": {
             "title": "1. 부동산 정보",
             "areaLabel": "부동산 면적 (제곱미터)",
@@ -35,7 +36,17 @@
             "customNeedsLabel": "사용자 지정 요구 사항",
             "customNeedsPlaceholder": "예: '노부모님이 계셔서 자동 야간 조명이 필요합니다.' 또는 '주로 홈 시네마 경험에 중점을 둡니다.'"
         },
-        "submitButton": "제안 생성"
+        "submitButton": "제안 생성",
+        "loading": {
+            "steps": {
+                "analyzingNeeds": "맞춤 요구 사항 분석 중...",
+                "evaluatingLayout": "부동산 레이아웃 평가 중...",
+                "selectingProducts": "최고의 스마트 제품 선택 중...",
+                "optimizingBudget": "예산에 맞게 최적화 중...",
+                "generatingReport": "분석 보고서 생성 중...",
+                "finalizing": "계획 마무리 중..."
+            }
+        }
     },
     "result": {
         "title": "당신의 스마트 홈 청사진",
