@@ -20,7 +20,7 @@ const formSchema = z.object({
   layout: z.string().min(1, 'Please select a layout.'),
   budgetLevel: z.enum(['economy', 'premium', 'luxury'], { required_error: 'Please select a budget tier.' }),
   customNeeds: z.string().optional(),
-  floorPlan: z.any().optional(),
+  floorPlan: z.instanceof(File).optional(),
 });
 
 export function PlanningForm() {
@@ -43,14 +43,12 @@ export function PlanningForm() {
     formData.append('budgetLevel', values.budgetLevel);
     formData.append('customNeeds', values.customNeeds || '');
     formData.append('language', language);
-    if (values.floorPlan && values.floorPlan.length > 0) {
-      formData.append('floorPlan', values.floorPlan[0]);
+    if (values.floorPlan) {
+      formData.append('floorPlan', values.floorPlan);
     }
     generateProposal(formData);
   };
   
-  const floorPlanRef = form.register('floorPlan');
-
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center text-center py-20 gap-4">
@@ -178,13 +176,15 @@ export function PlanningForm() {
                     <FormField
                       control={form.control}
                       name="floorPlan"
-                      render={() => (
+                      render={({ field }) => (
                         <FormItem>
                           <FormLabel>{t('planningForm.customization.floorPlanLabel')}</FormLabel>
                           <FormControl>
                             <div className="relative">
                                 <FileUp className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                                <Input type="file" accept="image/*" className="pl-9" {...floorPlanRef} />
+                                <Input type="file" accept="image/*" className="pl-9" 
+                                   onChange={(e) => field.onChange(e.target.files ? e.target.files[0] : undefined)}
+                                />
                             </div>
                           </FormControl>
                           <FormDescription>{t('planningForm.customization.floorPlanDescription')}</FormDescription>
