@@ -68,8 +68,8 @@ const formSchema = z.object({
   customProductsCsv: z.string().optional(),
 });
 
-const csvTemplateHeader = "产品名称,品牌,品类,价格,预算等级,生态平台(用;分隔),产品描述";
-const csvTemplateContent = `${csvTemplateHeader}\n自定义产品A,自定义品牌,网关,199,economy,"米家;HomeKit",这是一个用户自定义的产品示例，用于家庭的中央控制。\n自定义灯泡B,飞利浦,灯光,88,premium,Hue,高品质彩色智能灯泡，可调节亮度和颜色。`;
+const csvTemplateHeader = "产品名称,品牌,品类,价格,生态平台(用;分隔),产品描述";
+const csvTemplateContent = `${csvTemplateHeader}\n自定义产品A,自定义品牌,网关,199,"米家;HomeKit",这是一个用户自定义的产品示例，用于家庭的中央控制。\n自定义灯泡B,飞利浦,灯光,88,Hue,高品质彩色智能灯泡，可调节亮度和颜色。`;
 
 
 export function PlanningForm() {
@@ -119,9 +119,10 @@ export function PlanningForm() {
           if (parseResult.errors.length > 0) {
              throw new Error(`CSV文件表头或格式错误: ${parseResult.errors[0].message}`);
           }
-
-          if (!parseResult.meta.fields || !csvTemplateHeader.split(',').every(h => parseResult.meta.fields?.includes(h))) {
-             throw new Error(`CSV文件表头不匹配。需要包含: ${csvTemplateHeader}`);
+          
+          const requiredHeaders = csvTemplateHeader.split(',');
+          if (!parseResult.meta.fields || !requiredHeaders.every(h => parseResult.meta.fields?.includes(h))) {
+             throw new Error(`CSV文件表头不匹配。需要包含: ${requiredHeaders.join(', ')}`);
           }
           
           form.setValue('customProductsCsv', content);

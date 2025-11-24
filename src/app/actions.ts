@@ -56,7 +56,7 @@ export async function generateProposalAction(
                 brand: row['品牌'],
                 category: row['品类'],
                 price: Number(row['价格']),
-                budget_level: row['预算等级'] as 'economy' | 'premium' | 'luxury',
+                budget_level: 'economy', // Default to economy
                 ecosystem: row['生态平台(用;分隔)']?.split(';').map((e: string) => e.trim()).filter(Boolean) || [],
                 description: row['产品描述'],
                 imageUrl: `https://picsum.photos/seed/${crypto.randomUUID()}/400/400`,
