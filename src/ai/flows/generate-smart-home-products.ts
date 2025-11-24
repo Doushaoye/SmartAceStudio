@@ -68,10 +68,10 @@ const prompt = ai.definePrompt({
 
 请返回一个包含以下结构的JSON对象:
 {
-  "selected_items": [
+  "selectedItems": [
     { "product_id": "1001", "quantity": 1, "room": "客厅", "reason": "中央控制中心" }
   ],
-  "analysis_report": "Markdown格式的分析报告..."
+  "analysisReport": "Markdown格式的分析报告..."
 }
 
 analysis_report必须是中文的Markdown格式，并解释：
@@ -79,7 +79,7 @@ analysis_report必须是中文的Markdown格式，并解释：
 2.  如果预算允许，有哪些升级建议？
 3.  有哪些省钱的方法？
 
-确保返回的JSON是有效的，并且不包含任何Markdown包装。`, 
+确保返回的JSON是有效的，并且不包含任何Markdown包装。`,
 });
 
 const generateSmartHomeProductsFlow = ai.defineFlow(
