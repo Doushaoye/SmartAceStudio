@@ -7,7 +7,6 @@ import { MarkdownRenderer } from './markdown-renderer';
 import { Badge } from '@/components/ui/badge';
 import { useMemo } from 'react';
 import Image from 'next/image';
-import { findImage } from '@/lib/placeholder-images';
 import { useI18n } from '@/context/i18n-context';
 
 interface ResultDashboardProps {
@@ -69,17 +68,16 @@ export function ResultDashboard({ proposal }: ResultDashboardProps) {
                             </TableHeader>
                             <TableBody>
                                 {items.map(item => {
-                                const placeholder = findImage(item.image_id);
                                 return (
                                 <TableRow key={item.id}>
                                     <TableCell className="hidden md:table-cell">
                                         <Image
-                                            src={placeholder.imageUrl}
+                                            src={item.imageUrl || 'https://picsum.photos/seed/default/400/400'}
                                             alt={item.name}
                                             width={60}
                                             height={60}
                                             className="rounded-md object-cover"
-                                            data-ai-hint={placeholder.imageHint}
+                                            data-ai-hint={item.imageHint}
                                         />
                                     </TableCell>
                                     <TableCell>

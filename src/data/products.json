@@ -7,7 +7,9 @@
       "price": 249,
       "budget_level": "economy",
       "description": "Zigbee 3.0 gateway with night light.",
-      "image_id": "1001"
+      "image_id": "1001",
+      "imageUrl": "https://images.unsplash.com/photo-1728971825338-be9230fd4029?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxzbWFydCUyMGh1YnxlbnwwfHx8fDE3NjM5OTU1NDl8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "smart hub"
     },
     {
       "id": "1002",
@@ -17,7 +19,9 @@
       "price": 450,
       "budget_level": "premium",
       "description": "Multi-protocol gateway with IR remote control.",
-      "image_id": "1002"
+      "image_id": "1002",
+      "imageUrl": "https://images.unsplash.com/photo-1758577515339-93872db0d37e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxzbWFydCUyMGh1YnxlbnwwfHx8fDE3NjM5OTU1NDl8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "smart hub"
     },
     {
       "id": "2001",
@@ -27,7 +31,9 @@
       "price": 89,
       "budget_level": "economy",
       "description": "Smart wall switch, no neutral wire required.",
-      "image_id": "2001"
+      "image_id": "2001",
+      "imageUrl": "https://images.unsplash.com/photo-1638468626915-5b663bf32f6e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxsaWdodCUyMHN3aXRjaHxlbnwwfHx8fDE3NjM5OTU1NDl8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "light switch"
     },
     {
       "id": "2002",
@@ -37,7 +43,9 @@
       "price": 99,
       "budget_level": "economy",
       "description": "Smart wall switch, no neutral wire required.",
-      "image_id": "2002"
+      "image_id": "2002",
+      "imageUrl": "https://images.unsplash.com/photo-1531379410502-63bfe8cdaf6f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8bGlnaHQlMjBzd2l0Y2h8ZW58MHx8fHwxNzYzOTk1NTQ5fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "light switch"
     },
     {
       "id": "2003",
@@ -47,7 +55,9 @@
       "price": 250,
       "budget_level": "premium",
       "description": "High-end smart switch with dimming capabilities.",
-      "image_id": "2003"
+      "image_id": "2003",
+      "imageUrl": "https://images.unsplash.com/photo-1761479373576-ad4c1c5bb9af?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxkaW1tZXIlMjBzd2l0Y2h8ZW58MHx8fHwxNzYzOTk1NTQ4fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "dimmer switch"
     },
     {
       "id": "3001",
@@ -57,7 +67,9 @@
       "price": 79,
       "budget_level": "economy",
       "description": "Remotely control your appliances.",
-      "image_id": "3001"
+      "image_id": "3001",
+      "imageUrl": "https://images.unsplash.com/photo-1747992422276-ab5785d6ad18?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxzbWFydCUyMHBsdWd8ZW58MHx8fHwxNzYzOTk1NTQ5fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "smart plug"
     },
     {
       "id": "3002",
@@ -67,7 +79,9 @@
       "price": 60,
       "budget_level": "economy",
       "description": "Affordable and reliable smart plug.",
-      "image_id": "3002"
+      "image_id": "3002",
+      "imageUrl": "https://images.unsplash.com/photo-1672149107066-7a99f512d39b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxzbWFydCUyMHBsdWd8ZW58MHx8fHwxNzYzOTk1NTQ5fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "smart plug"
     },
     {
       "id": "4001",
@@ -77,7 +91,9 @@
       "price": 199,
       "budget_level": "premium",
       "description": "Smart LED bulb with 16 million colors.",
-      "image_id": "4001"
+      "image_id": "4001",
+      "imageUrl": "https://images.unsplash.com/photo-1531379410502-63bfe8cdaf6f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxsaWdodCUyMGJ1bGJ8ZW58MHx8fHwxNzYzOTI2OTkxfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "light bulb"
     },
     {
       "id": "4002",
@@ -87,7 +103,9 @@
       "price": 75,
       "budget_level": "economy",
       "description": "Dimmable and color temperature adjustable smart bulb.",
-      "image_id": "4002"
+      "image_id": "4002",
+      "imageUrl": "https://images.unsplash.com/photo-1495291916458-c12f594151e7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxsaWdodCUyMGJ1bGJ8ZW58MHx8fHwxNzYzOTI2OTkxfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "light bulb"
     },
     {
       "id": "4003",
@@ -97,7 +115,9 @@
       "price": 800,
       "budget_level": "luxury",
       "description": "Modular backlit smart light bars.",
-      "image_id": "4003"
+      "image_id": "4003",
+      "imageUrl": "https://images.unsplash.com/photo-1761234652554-3f27bd0fb9ae?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxhbWJpZW50JTIwbGlnaHRpbmd8ZW58MHx8fHwxNzYzOTk1NTQ5fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "ambient lighting"
     },
     {
       "id": "5001",
@@ -107,7 +127,9 @@
       "price": 99,
       "budget_level": "economy",
       "description": "Detects motion to trigger scenes and automations.",
-      "image_id": "5001"
+      "image_id": "5001",
+      "imageUrl": "https://images.unsplash.com/photo-1758961256920-c8ae884e76fa?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxtb3Rpb24lMjBzZW5zb3J8ZW58MHx8fHwxNzYzOTk1NTQ5fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "motion sensor"
     },
     {
       "id": "5002",
@@ -117,7 +139,9 @@
       "price": 180,
       "budget_level": "premium",
       "description": "Wireless, battery-powered motion sensor for the Hue system.",
-      "image_id": "5002"
+      "image_id": "5002",
+      "imageUrl": "https://images.unsplash.com/photo-1758961256920-c8ae884e76fa?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxtb3Rpb24lMjBzZW5zb3J8ZW58MHx8fHwxNzYzOTk1NTQ5fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "motion sensor"
     },
     {
       "id": "6001",
@@ -127,7 +151,9 @@
       "price": 79,
       "budget_level": "economy",
       "description": "Detects if a window or door is open in real time.",
-      "image_id": "6001"
+      "image_id": "6001",
+      "imageUrl": "https://images.unsplash.com/photo-1746893737268-81fe686e6a51?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxjb250YWN0JTIwc2Vuc29yfGVufDB8fHx8MTc2Mzk5NTU0OHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "contact sensor"
     },
     {
       "id": "6002",
@@ -137,7 +163,9 @@
       "price": 100,
       "budget_level": "premium",
       "description": "Part of the Ring security ecosystem.",
-      "image_id": "6002"
+      "image_id": "6002",
+      "imageUrl": "https://images.unsplash.com/photo-1736488679013-38f65b0ae82c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxjb250YWN0JTIwc2Vuc29yfGVufDB8fHx8MTc2Mzk5NTU0OHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "contact sensor"
     },
     {
       "id": "7001",
@@ -147,7 +175,9 @@
       "price": 450,
       "budget_level": "economy",
       "description": "Automate your existing curtains.",
-      "image_id": "7001"
+      "image_id": "7001",
+      "imageUrl": "https://images.unsplash.com/photo-1698020067681-f39e13a053f1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxjdXJ0YWluJTIwbW90b3J8ZW58MHx8fHwxNzYzOTk1NTQ5fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "curtain motor"
     },
     {
       "id": "7002",
@@ -157,7 +187,9 @@
       "price": 2500,
       "budget_level": "luxury",
       "description": "High-end, ultra-quiet curtain motor for large curtains.",
-      "image_id": "7002"
+      "image_id": "7002",
+      "imageUrl": "https://images.unsplash.com/photo-1747605975912-9349d22c6e19?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxjdXJ0YWluJTIwdHJhY2t8ZW58MHx8fHwxNzYzOTk1NTQ5fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "curtain track"
     },
     {
       "id": "8001",
@@ -167,7 +199,9 @@
       "price": 1200,
       "budget_level": "premium",
       "description": "Multiple unlocking methods including fingerprint and NFC.",
-      "image_id": "8001"
+      "image_id": "8001",
+      "imageUrl": "https://images.unsplash.com/photo-1558089687-f282ffcbc126?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxzbWFydCUyMGxvY2t8ZW58MHx8fHwxNzYzOTk1NTQ5fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "smart lock"
     },
     {
       "id": "8002",
@@ -177,7 +211,9 @@
       "price": 900,
       "budget_level": "premium",
       "description": "Fingerprint scanner and Wi-Fi connectivity.",
-      "image_id": "8002"
+      "image_id": "8002",
+      "imageUrl": "https://images.unsplash.com/photo-1707167144744-96723112e356?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxzbWFydCUyMGxvY2t8ZW58MHx8fHwxNzYzOTk1NTQ5fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "smart lock"
     },
     {
       "id": "8003",
@@ -187,19 +223,154 @@
       "price": 1100,
       "budget_level": "premium",
       "description": "Retrofit smart lock that attaches to your existing deadbolt.",
-      "image_id": "8003"
+      "image_id": "8003",
+      "imageUrl": "https://images.unsplash.com/photo-1532550256335-c281a64ac9f6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxkb29yJTIwbG9ja3xlbnwwfHx8fDE3NjM5OTU1NDl8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "door lock"
     },
-    {"id": "9001", "name": "Google Nest Hub Max", "brand": "Google", "category": "Gateway", "price": 1500, "budget_level": "luxury", "description": "Smart display with a camera and powerful speaker.", "image_id": "9001"},
-    {"id": "9002", "name": "Amazon Echo Show 10", "brand": "Amazon", "category": "Gateway", "price": 1600, "budget_level": "luxury", "description": "Smart display that moves with you.", "image_id": "9002"},
-    {"id": "2004", "name": "Brilliant Smart Home Control (2-Switch Panel)", "brand": "Brilliant", "category": "Switch", "price": 2200, "budget_level": "luxury", "description": "All-in-one smart home control panel that replaces a standard light switch.", "image_id": "2004"},
-    {"id": "4004", "name": "IKEA TRÅDFRI LED bulb E26", "brand": "IKEA", "category": "Light", "price": 50, "budget_level": "economy", "description": "Affordable smart bulb with basic dimming.", "image_id": "4004"},
-    {"id": "4005", "name": "LIFX Color A19", "brand": "LIFX", "category": "Light", "price": 220, "budget_level": "premium", "description": "Vibrant colors and no hub required.", "image_id": "4005"},
-    {"id": "5003", "name": "Aeotec MultiSensor 6", "brand": "Aeotec", "category": "Motion Sensor", "price": 250, "budget_level": "luxury", "description": "6-in-1 Z-Wave sensor: motion, temperature, humidity, light, UV, vibration.", "image_id": "5003"},
-    {"id": "7003", "name": "SwitchBot Curtain", "brand": "SwitchBot", "category": "Curtain Motor", "price": 380, "budget_level": "economy", "description": "Easy to install retrofit curtain robot.", "image_id": "7003"},
-    {"id": "8004", "name": "Wyze Lock", "brand": "Wyze", "category": "Smart Lock", "price": 550, "budget_level": "economy", "description": "Affordable smart lock that works with your existing deadbolt.", "image_id": "8004"},
-    {"id": "1003", "name": "Hubitat Elevation Model C-7", "brand": "Hubitat", "category": "Gateway", "price": 700, "budget_level": "premium", "description": "Local processing for speed and reliability.", "image_id": "1003"},
-    {"id": "4006", "name": "Dyson Lightcycle Morph", "brand": "Dyson", "category": "Light", "price": 4500, "budget_level": "luxury", "description": "Intelligent task light that tracks local daylight.", "image_id": "4006"},
-    {"id": "2005", "name": "Sonoff TX Ultimate (2-Gang)", "brand": "Sonoff", "category": "Switch", "price": 150, "budget_level": "economy", "description": "Smart wall switch with haptic feedback and ambient light.", "image_id": "2005"},
-    {"id": "3003", "name": "Eve Energy Smart Plug", "brand": "Eve", "category": "Socket", "price": 180, "budget_level": "premium", "description": "Thread-enabled smart plug with energy monitoring.", "image_id": "3003"}
+    {
+      "id": "9001",
+      "name": "Google Nest Hub Max",
+      "brand": "Google",
+      "category": "Gateway",
+      "price": 1500,
+      "budget_level": "luxury",
+      "description": "Smart display with a camera and powerful speaker.",
+      "image_id": "9001",
+      "imageUrl": "https://images.unsplash.com/photo-1726463276806-63a1e75ccb66?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxzbWFydCUyMGRpc3BsYXl8ZW58MHx8fHwxNzYzOTk1NTQ5fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "smart display"
+    },
+    {
+      "id": "9002",
+      "name": "Amazon Echo Show 10",
+      "brand": "Amazon",
+      "category": "Gateway",
+      "price": 1600,
+      "budget_level": "luxury",
+      "description": "Smart display that moves with you.",
+      "image_id": "9002",
+      "imageUrl": "https://images.unsplash.com/photo-1571251455684-2eb131fdb294?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxzbWFydCUyMGRpc3BsYXl8ZW58MHx8fHwxNzYzOTk1NTQ5fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "smart display"
+    },
+    {
+      "id": "2004",
+      "name": "Brilliant Smart Home Control (2-Switch Panel)",
+      "brand": "Brilliant",
+      "category": "Switch",
+      "price": 2200,
+      "budget_level": "luxury",
+      "description": "All-in-one smart home control panel that replaces a standard light switch.",
+      "image_id": "2004",
+      "imageUrl": "https://images.unsplash.com/photo-1702390796625-6dd9b46b1c0b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxzbWFydCUyMGNvbnRyb2xsZXJ8ZW58MHx8fHwxNzYzOTk1NTQ5fDA&ixlibrb-4.1.0&q=80&w=1080",
+      "imageHint": "smart controller"
+    },
+    {
+      "id": "4004",
+      "name": "IKEA TRÅDFRI LED bulb E26",
+      "brand": "IKEA",
+      "category": "Light",
+      "price": 50,
+      "budget_level": "economy",
+      "description": "Affordable smart bulb with basic dimming.",
+      "image_id": "4004",
+      "imageUrl": "https://images.unsplash.com/photo-1493612276216-ee3925520721?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxsaWdodCUyMGJ1bGJ8ZW58MHx8fHwxNzYzOTI2OTkxfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "light bulb"
+    },
+    {
+      "id": "4005",
+      "name": "LIFX Color A19",
+      "brand": "LIFX",
+      "category": "Light",
+      "price": 220,
+      "budget_level": "premium",
+      "description": "Vibrant colors and no hub required.",
+      "image_id": "4005",
+      "imageUrl": "https://images.unsplash.com/photo-1448745799564-e2c1ed534c94?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxsaWdodCUyMGJ1bGJ8ZW58MHx8fHwxNzYzOTI2OTkxfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "light bulb"
+    },
+    {
+      "id": "5003",
+      "name": "Aeotec MultiSensor 6",
+      "brand": "Aeotec",
+      "category": "Motion Sensor",
+      "price": 250,
+      "budget_level": "luxury",
+      "description": "6-in-1 Z-Wave sensor: motion, temperature, humidity, light, UV, vibration.",
+      "image_id": "5003",
+      "imageUrl": "https://picsum.photos/seed/5003/400/400",
+      "imageHint": "multisensor"
+    },
+    {
+      "id": "7003",
+      "name": "SwitchBot Curtain",
+      "brand": "SwitchBot",
+      "category": "Curtain Motor",
+      "price": 380,
+      "budget_level": "economy",
+      "description": "Easy to install retrofit curtain robot.",
+      "image_id": "7003",
+      "imageUrl": "https://images.unsplash.com/photo-1549912452-6af4d7b42c4e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxjdXJ0YWluJTIwcm9ib3R8ZW58MHx8fHwxNzYzOTk1NTQ5fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "curtain robot"
+    },
+    {
+      "id": "8004",
+      "name": "Wyze Lock",
+      "brand": "Wyze",
+      "category": "Smart Lock",
+      "price": 550,
+      "budget_level": "economy",
+      "description": "Affordable smart lock that works with your existing deadbolt.",
+      "image_id": "8004",
+      "imageUrl": "https://images.unsplash.com/photo-1625056104287-f4eec32ed9c1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8ZG9vciUyMGxvY2t8ZW58MHx8fHwxNzYzOTk1NTQ5fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "door lock"
+    },
+    {
+      "id": "1003",
+      "name": "Hubitat Elevation Model C-7",
+      "brand": "Hubitat",
+      "category": "Gateway",
+      "price": 700,
+      "budget_level": "premium",
+      "description": "Local processing for speed and reliability.",
+      "image_id": "1003",
+      "imageUrl": "https://images.unsplash.com/photo-1571251455684-2eb131fdb294?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxzbWFydCUyMGh1YnxlbnwwfHx8fDE3NjM5OTU1NDl8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "smart hub"
+    },
+    {
+      "id": "4006",
+      "name": "Dyson Lightcycle Morph",
+      "brand": "Dyson",
+      "category": "Light",
+      "price": 4500,
+      "budget_level": "luxury",
+      "description": "Intelligent task light that tracks local daylight.",
+      "image_id": "4006",
+      "imageUrl": "https://images.unsplash.com/photo-1619608135352-868e8313e121?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxkZXNrJTIwbGFtcHxlbnwwfHx8fDE3NjM5OTQ2NTJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "desk lamp"
+    },
+    {
+      "id": "2005",
+      "name": "Sonoff TX Ultimate (2-Gang)",
+      "brand": "Sonoff",
+      "category": "Switch",
+      "price": 150,
+      "budget_level": "economy",
+      "description": "Smart wall switch with haptic feedback and ambient light.",
+      "image_id": "2005",
+      "imageUrl": "https://images.unsplash.com/photo-1583047960442-1e3e6d50ab02?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHx3YWxsJTIwc3dpdGNofGVufDB8fHx8MTc2Mzk5NTU0OXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "wall switch"
+    },
+    {
+      "id": "3003",
+      "name": "Eve Energy Smart Plug",
+      "brand": "Eve",
+      "category": "Socket",
+      "price": 180,
+      "budget_level": "premium",
+      "description": "Thread-enabled smart plug with energy monitoring.",
+      "image_id": "3003",
+      "imageUrl": "https://images.unsplash.com/photo-1752830132482-def8649b6432?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxzbWFydCUyMHBsdWd8ZW58MHx8fHwxNzYzOTk1NTQ5fDA&ixlibrb-4.1.0&q=80&w=1080",
+      "imageHint": "smart plug"
+    }
   ]
   
+    

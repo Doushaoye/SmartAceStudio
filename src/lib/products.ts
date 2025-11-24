@@ -10,6 +10,8 @@ export type Product = {
   budget_level: 'economy' | 'premium' | 'luxury';
   description: string;
   image_id: string;
+  imageUrl: string;
+  imageHint: string;
 };
 
 export const products: Product[] = productsData;
