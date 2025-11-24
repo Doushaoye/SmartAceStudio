@@ -15,6 +15,7 @@ export async function generateProposalAction(
     const budgetLevel = formData.get('budgetLevel') as 'economy' | 'premium' | 'luxury';
     const customNeeds = formData.get('customNeeds') as string;
     const floorPlanFile = formData.get('floorPlan') as File | null;
+    const language = formData.get('language') as 'en' | 'zh' | 'ja' | 'ko';
 
     let floorPlanDataUri: string | undefined = undefined;
     if (floorPlanFile && floorPlanFile.size > 0) {
@@ -30,6 +31,7 @@ export async function generateProposalAction(
       customNeeds,
       floorPlanDataUri,
       productsJson,
+      language,
     });
 
     if (!aiResult || !aiResult.selectedItems || !aiResult.analysisReport) {

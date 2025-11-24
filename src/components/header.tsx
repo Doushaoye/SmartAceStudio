@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Logo } from '@/components/logo';
+import { LanguageSwitcher } from './language-switcher';
 
 export function Header() {
   return (
@@ -9,6 +10,9 @@ export function Header() {
           <Logo />
           <span className="font-bold font-headline hidden sm:inline-block">SmartHome AI Planner</span>
         </Link>
+        <div className="ml-auto">
+          <LanguageSwitcher />
+        </div>
       </div>
     </header>
   );

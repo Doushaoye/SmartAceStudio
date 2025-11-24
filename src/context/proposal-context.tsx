@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import { generateProposalAction } from '@/app/actions';
 import type { Proposal } from '@/lib/products';
+import { useI18n } from './i18n-context';
 
 interface ProposalContextType {
   proposal: Proposal | null;
@@ -22,6 +23,7 @@ export function ProposalProvider({ children }: { children: ReactNode }) {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const { toast } = useToast();
+  const { t } = useI18n();
 
   const generateProposal = async (data: FormData) => {
     setIsLoading(true);
@@ -34,11 +36,11 @@ export function ProposalProvider({ children }: { children: ReactNode }) {
       setProposal(result.proposal);
       router.push('/result');
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred.';
+      const errorMessage = err instanceof Error ? err.message : t('errors.unknown');
       setError(errorMessage);
       toast({
         variant: 'destructive',
-        title: 'Error Generating Proposal',
+        title: t('errors.generateProposalTitle'),
         description: errorMessage,
       });
       setIsLoading(false);

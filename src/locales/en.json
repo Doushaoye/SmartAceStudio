@@ -1,0 +1,57 @@
+{
+    "home": {
+        "title": "Smart Home Budget Planner",
+        "subtitle": "AI-driven customization for your dream home. Input your needs, and let our AI craft the perfect smart home plan for your budget.",
+        "ctaButton": "Start Planning"
+    },
+    "planningForm": {
+        "title": "Create Your Smart Home Plan",
+        "loadingTitle": "AI is analyzing your request...",
+        "loadingDescription": "This may take a moment. We're crafting a personalized smart home plan just for you, analyzing the floor plan and your custom needs.",
+        "propertyInfo": {
+            "title": "1. Property Information",
+            "areaLabel": "Property Area (sq ft)",
+            "areaPlaceholder": "e.g., 1200",
+            "layoutLabel": "Layout",
+            "layoutPlaceholder": "Select a property layout",
+            "layoutOptions": {
+                "studio": "Studio",
+                "1b1b": "1 Bed 1 Bath",
+                "2b1b": "2 Bed 1 Bath",
+                "3b2b": "3 Bed 2 Bath",
+                "villa": "Villa"
+            }
+        },
+        "budget": {
+            "title": "2. Budget Tier",
+            "economy": { "label": "Economy", "description": "Practical & Cost-Effective" },
+            "premium": { "label": "Premium", "description": "Comfort & Performance" },
+            "luxury": { "label": "Luxury", "description": "High-End & Automated" }
+        },
+        "customization": {
+            "title": "3. Customization",
+            "floorPlanLabel": "Floor Plan (Optional)",
+            "floorPlanDescription": "Upload an image of your floor plan for better recommendations.",
+            "customNeedsLabel": "Custom Needs",
+            "customNeedsPlaceholder": "e.g., 'I have elderly parents, need automated night lights.' or 'Primarily focused on home cinema experience.'"
+        },
+        "submitButton": "Generate Proposal"
+    },
+    "result": {
+        "title": "Your Smart Home Blueprint",
+        "subtitle": "A detailed breakdown of your AI-generated product list.",
+        "table": {
+            "image": "Image",
+            "product": "Product",
+            "quantity": "Qty",
+            "unitPrice": "Unit Price",
+            "subtotal": "Subtotal"
+        },
+        "totalBudget": "Total Estimated Budget",
+        "aiAnalysis": "AI Consultant Analysis"
+    },
+    "errors": {
+        "unknown": "An unknown error occurred.",
+        "generateProposalTitle": "Error Generating Proposal"
+    }
+}

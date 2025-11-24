@@ -23,6 +23,7 @@ const GenerateSmartHomeProductsInputSchema = z.object({
     ),
   customNeeds: z.string().describe('Any custom needs or preferences specified by the user.'),
   productsJson: z.string().describe('The full JSON content of the products database.'),
+  language: z.enum(['en', 'zh', 'ja', 'ko']).describe('The language for the response.'),
 });
 export type GenerateSmartHomeProductsInput = z.infer<typeof GenerateSmartHomeProductsInputSchema>;
 
@@ -49,6 +50,8 @@ const prompt = ai.definePrompt({
   output: {schema: GenerateSmartHomeProductsOutputSchema},
   prompt: `You are an AI smart home consultant. Analyze the user's property details, budget, and needs to recommend a list of smart home products.
 
+Generate the response in the following language: {{{language}}}
+
 Property Details:
 Area: {{{area}}} sq ft
 Layout: {{{layout}}}
@@ -61,7 +64,7 @@ Floor Plan: {{media url=floorPlanDataUri}}
 Available Products:
 {{{productsJson}}}
 
-Based on the above information, select a list of smart home products that are suitable for the user. Consider their budget and needs when making your selections.
+Based on the above information, select a list of smart home products that are suitable for the user. Consider their budget and needs when making your selections. The "room" and "reason" fields in the output must be in the requested language.
 
 Return a JSON object with the following structure:
 {
@@ -71,7 +74,7 @@ Return a JSON object with the following structure:
   "analysis_report": "Markdown string here..."
 }
 
-The analysis_report must explain:
+The analysis_report must be in the requested language ({{{language}}}) and must explain:
 1. What features were compromised due to budget?
 2. Suggestions for upgrades if budget allows.
 3. Ways to save money.
@@ -90,4 +93,3 @@ const generateSmartHomeProductsFlow = ai.defineFlow(
     return output!;
   }
 );
-

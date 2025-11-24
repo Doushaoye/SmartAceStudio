@@ -12,7 +12,7 @@ export type Product = {
   image_id: string;
 };
 
-export const products: Product[] = productsData.map(p => ({...p, name: p.name || p['nameL'] || p['nameD']}));
+export const products: Product[] = productsData;
 
 export type SelectedItem = NonNullable<GenerateSmartHomeProductsOutput['selectedItems']>[0];
 

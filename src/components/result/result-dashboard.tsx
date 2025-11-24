@@ -8,12 +8,14 @@ import { Badge } from '@/components/ui/badge';
 import { useMemo } from 'react';
 import Image from 'next/image';
 import { findImage } from '@/lib/placeholder-images';
+import { useI18n } from '@/context/i18n-context';
 
 interface ResultDashboardProps {
   proposal: Proposal;
 }
 
 export function ResultDashboard({ proposal }: ResultDashboardProps) {
+  const { t, language } = useI18n();
   const { analysisReport, enrichedItems } = proposal;
 
   const totalCost = useMemo(() => {
@@ -31,19 +33,24 @@ export function ResultDashboard({ proposal }: ResultDashboardProps) {
     }, {});
   }, [enrichedItems]);
 
-  const currencyFormatter = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 0,
-  });
+  const currencyFormatter = useMemo(() => {
+    const currency = language === 'zh' ? 'CNY' : 'USD';
+    const locale = language === 'zh' ? 'zh-CN' : 'en-US';
+    return new Intl.NumberFormat(locale, {
+      style: 'currency',
+      currency: currency,
+      minimumFractionDigits: 0,
+    });
+  }, [language]);
+
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
       <div className="lg:col-span-2 space-y-8">
         <Card>
             <CardHeader>
-                <CardTitle className="font-headline text-3xl">Your Smart Home Blueprint</CardTitle>
-                <CardDescription>A detailed breakdown of your AI-generated product list.</CardDescription>
+                <CardTitle className="font-headline text-3xl">{t('result.title')}</CardTitle>
+                <CardDescription>{t('result.subtitle')}</CardDescription>
             </CardHeader>
             <CardContent>
                 {Object.entries(groupedByRoom).map(([room, items]) => (
@@ -53,11 +60,11 @@ export function ResultDashboard({ proposal }: ResultDashboardProps) {
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                <TableHead className="w-[80px] hidden md:table-cell">Image</TableHead>
-                                <TableHead>Product</TableHead>
-                                <TableHead>Qty</TableHead>
-                                <TableHead className="text-right">Unit Price</TableHead>
-                                <TableHead className="text-right">Subtotal</TableHead>
+                                <TableHead className="w-[80px] hidden md:table-cell">{t('result.table.image')}</TableHead>
+                                <TableHead>{t('result.table.product')}</TableHead>
+                                <TableHead>{t('result.table.quantity')}</TableHead>
+                                <TableHead className="text-right">{t('result.table.unitPrice')}</TableHead>
+                                <TableHead className="text-right">{t('result.table.subtotal')}</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -95,7 +102,7 @@ export function ResultDashboard({ proposal }: ResultDashboardProps) {
       <div className="lg:col-span-1 space-y-8">
         <Card className="sticky top-20">
           <CardHeader>
-            <CardTitle className="font-headline">Total Estimated Budget</CardTitle>
+            <CardTitle className="font-headline">{t('result.totalBudget')}</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-4xl font-bold">{currencyFormatter.format(totalCost)}</p>
@@ -103,7 +110,7 @@ export function ResultDashboard({ proposal }: ResultDashboardProps) {
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle className="font-headline">AI Consultant Analysis</CardTitle>
+            <CardTitle className="font-headline">{t('result.aiAnalysis')}</CardTitle>
           </CardHeader>
           <CardContent className="bg-blue-50 dark:bg-blue-900/10 p-4 rounded-lg">
             <MarkdownRenderer content={analysisReport} />

@@ -13,6 +13,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { useProposal } from '@/context/proposal-context';
 import { DollarSign, Zap, Gem, ArrowRight, Loader2, FileUp } from 'lucide-react';
+import { useI18n } from '@/context/i18n-context';
 
 const formSchema = z.object({
   area: z.coerce.number().min(10, 'Area must be at least 10 sq ft.'),
@@ -24,6 +25,7 @@ const formSchema = z.object({
 
 export function PlanningForm() {
   const { isLoading, generateProposal } = useProposal();
+  const { t, language } = useI18n();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -40,6 +42,7 @@ export function PlanningForm() {
     formData.append('layout', values.layout);
     formData.append('budgetLevel', values.budgetLevel);
     formData.append('customNeeds', values.customNeeds || '');
+    formData.append('language', language);
     if (values.floorPlan) {
       formData.append('floorPlan', values.floorPlan);
     }
@@ -52,9 +55,9 @@ export function PlanningForm() {
     return (
       <div className="flex flex-col items-center justify-center text-center py-20 gap-4">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
-        <h2 className="text-2xl font-semibold font-headline">AI is analyzing your request...</h2>
+        <h2 className="text-2xl font-semibold font-headline">{t('planningForm.loadingTitle')}</h2>
         <p className="text-muted-foreground max-w-md">
-          This may take a moment. We're crafting a personalized smart home plan just for you, analyzing the floor plan and your custom needs.
+          {t('planningForm.loadingDescription')}
         </p>
       </div>
     );
@@ -63,22 +66,22 @@ export function PlanningForm() {
   return (
     <Card className="max-w-4xl mx-auto">
       <CardHeader>
-        <CardTitle className="font-headline text-3xl">Create Your Smart Home Plan</CardTitle>
+        <CardTitle className="font-headline text-3xl">{t('planningForm.title')}</CardTitle>
       </CardHeader>
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <div className="space-y-6">
-              <h3 className="font-semibold text-lg font-headline">1. Property Information</h3>
+              <h3 className="font-semibold text-lg font-headline">{t('planningForm.propertyInfo.title')}</h3>
               <div className="grid md:grid-cols-2 gap-6">
                 <FormField
                   control={form.control}
                   name="area"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Property Area (sq ft)</FormLabel>
+                      <FormLabel>{t('planningForm.propertyInfo.areaLabel')}</FormLabel>
                       <FormControl>
-                        <Input type="number" placeholder="e.g., 1200" {...field} />
+                        <Input type="number" placeholder={t('planningForm.propertyInfo.areaPlaceholder')} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -89,19 +92,19 @@ export function PlanningForm() {
                   name="layout"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Layout</FormLabel>
+                      <FormLabel>{t('planningForm.propertyInfo.layoutLabel')}</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Select a property layout" />
+                            <SelectValue placeholder={t('planningForm.propertyInfo.layoutPlaceholder')} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="Studio">Studio</SelectItem>
-                          <SelectItem value="1B1B">1 Bed 1 Bath</SelectItem>
-                          <SelectItem value="2B1B">2 Bed 1 Bath</SelectItem>
-                          <SelectItem value="3B2B">3 Bed 2 Bath</SelectItem>
-                          <SelectItem value="Villa">Villa</SelectItem>
+                          <SelectItem value="Studio">{t('planningForm.propertyInfo.layoutOptions.studio')}</SelectItem>
+                          <SelectItem value="1B1B">{t('planningForm.propertyInfo.layoutOptions.1b1b')}</SelectItem>
+                          <SelectItem value="2B1B">{t('planningForm.propertyInfo.layoutOptions.2b1b')}</SelectItem>
+                          <SelectItem value="3B2B">{t('planningForm.propertyInfo.layoutOptions.3b2b')}</SelectItem>
+                          <SelectItem value="Villa">{t('planningForm.propertyInfo.layoutOptions.villa')}</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -112,7 +115,7 @@ export function PlanningForm() {
             </div>
 
             <div className="space-y-6">
-              <h3 className="font-semibold text-lg font-headline">2. Budget Tier</h3>
+              <h3 className="font-semibold text-lg font-headline">{t('planningForm.budget.title')}</h3>
               <FormField
                 control={form.control}
                 name="budgetLevel"
@@ -132,8 +135,8 @@ export function PlanningForm() {
                           className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
                         >
                           <DollarSign className="mb-3 h-6 w-6" />
-                          Economy
-                          <span className="text-xs text-muted-foreground mt-1">Practical & Cost-Effective</span>
+                          {t('planningForm.budget.economy.label')}
+                          <span className="text-xs text-muted-foreground mt-1">{t('planningForm.budget.economy.description')}</span>
                         </Label>
                       </FormItem>
                       <FormItem>
@@ -145,8 +148,8 @@ export function PlanningForm() {
                           className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
                         >
                           <Zap className="mb-3 h-6 w-6" />
-                          Premium
-                           <span className="text-xs text-muted-foreground mt-1">Comfort & Performance</span>
+                          {t('planningForm.budget.premium.label')}
+                           <span className="text-xs text-muted-foreground mt-1">{t('planningForm.budget.premium.description')}</span>
                         </Label>
                       </FormItem>
                       <FormItem>
@@ -158,8 +161,8 @@ export function PlanningForm() {
                           className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
                         >
                           <Gem className="mb-3 h-6 w-6" />
-                          Luxury
-                           <span className="text-xs text-muted-foreground mt-1">High-End & Automated</span>
+                          {t('planningForm.budget.luxury.label')}
+                           <span className="text-xs text-muted-foreground mt-1">{t('planningForm.budget.luxury.description')}</span>
                         </Label>
                       </FormItem>
                     </RadioGroup>
@@ -170,21 +173,21 @@ export function PlanningForm() {
             </div>
             
             <div className="space-y-6">
-                <h3 className="font-semibold text-lg font-headline">3. Customization</h3>
+                <h3 className="font-semibold text-lg font-headline">{t('planningForm.customization.title')}</h3>
                 <div className="grid md:grid-cols-2 gap-6">
                     <FormField
                       control={form.control}
                       name="floorPlan"
                       render={({ field: { onChange, ...field } }) => (
                         <FormItem>
-                          <FormLabel>Floor Plan (Optional)</FormLabel>
+                          <FormLabel>{t('planningForm.customization.floorPlanLabel')}</FormLabel>
                           <FormControl>
                             <div className="relative">
                                 <FileUp className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                                 <Input type="file" accept="image/*" className="pl-9" {...floorPlanRef} onChange={(e) => onChange(e.target.files?.[0])} />
                             </div>
                           </FormControl>
-                          <FormDescription>Upload an image of your floor plan for better recommendations.</FormDescription>
+                          <FormDescription>{t('planningForm.customization.floorPlanDescription')}</FormDescription>
                           <FormMessage />
                         </FormItem>
                       )}
@@ -194,10 +197,10 @@ export function PlanningForm() {
                       name="customNeeds"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Custom Needs</FormLabel>
+                          <FormLabel>{t('planningForm.customization.customNeedsLabel')}</FormLabel>
                           <FormControl>
                             <Textarea
-                              placeholder="e.g., 'I have elderly parents, need automated night lights.' or 'Primarily focused on home cinema experience.'"
+                              placeholder={t('planningForm.customization.customNeedsPlaceholder')}
                               className="resize-none"
                               {...field}
                               rows={4}
@@ -212,7 +215,7 @@ export function PlanningForm() {
 
             <div className="flex justify-end pt-4">
               <Button type="submit" size="lg" disabled={isLoading}>
-                Generate Proposal
+                {t('planningForm.submitButton')}
                 <ArrowRight />
               </Button>
             </div>

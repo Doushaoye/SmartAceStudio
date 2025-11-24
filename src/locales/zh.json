@@ -1,0 +1,57 @@
+{
+    "home": {
+        "title": "智能家居预算规划师",
+        "subtitle": "AI 驱动，为您定制梦想之家。输入您的需求，让我们的 AI 为您的预算打造完美的智能家居计划。",
+        "ctaButton": "开始规划"
+    },
+    "planningForm": {
+        "title": "创建您的智能家居计划",
+        "loadingTitle": "AI 正在分析您的请求...",
+        "loadingDescription": "这可能需要一些时间。我们正在为您量身打造个性化的智能家居计划，分析平面图和您的定制需求。",
+        "propertyInfo": {
+            "title": "1. 房产信息",
+            "areaLabel": "房产面积 (平方米)",
+            "areaPlaceholder": "例如, 110",
+            "layoutLabel": "户型",
+            "layoutPlaceholder": "请选择房产户型",
+            "layoutOptions": {
+                "studio": "单间",
+                "1b1b": "一室一卫",
+                "2b1b": "两室一卫",
+                "3b2b": "三室两卫",
+                "villa": "别墅"
+            }
+        },
+        "budget": {
+            "title": "2. 预算等级",
+            "economy": { "label": "经济型", "description": "实用且经济" },
+            "premium": { "label": "高级型", "description": "舒适与性能" },
+            "luxury": { "label": "豪华型", "description": "高端与自动化" }
+        },
+        "customization": {
+            "title": "3. 个性化定制",
+            "floorPlanLabel": "平面图 (可选)",
+            "floorPlanDescription": "上传您的平面图以获得更好的推荐。",
+            "customNeedsLabel": "定制需求",
+            "customNeedsPlaceholder": "例如：'家有老人，需要自动夜灯。' 或 '主要用于家庭影院体验。'"
+        },
+        "submitButton": "生成方案"
+    },
+    "result": {
+        "title": "您的智能家居蓝图",
+        "subtitle": "由 AI 生成的产品清单详解。",
+        "table": {
+            "image": "图片",
+            "product": "产品",
+            "quantity": "数量",
+            "unitPrice": "单价",
+            "subtotal": "小计"
+        },
+        "totalBudget": "预计总预算",
+        "aiAnalysis": "AI 顾问分析"
+    },
+    "errors": {
+        "unknown": "发生未知错误。",
+        "generateProposalTitle": "生成方案时出错"
+    }
+}

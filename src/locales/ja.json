@@ -1,0 +1,57 @@
+{
+    "home": {
+        "title": "スマートホーム予算プランナー",
+        "subtitle": "AIがあなたの夢の家をカスタマイズ。ニーズを入力すれば、AIがあなたの予算に最適なスマートホームプランを作成します。",
+        "ctaButton": "計画を開始"
+    },
+    "planningForm": {
+        "title": "スマートホームプランを作成",
+        "loadingTitle": "AIがリクエストを分析中...",
+        "loadingDescription": "少々お待ちください。フロアプランとカスタムニーズを分析し、あなただけのスマートホームプランを作成しています。",
+        "propertyInfo": {
+            "title": "1. 物件情報",
+            "areaLabel": "物件面積 (平方メートル)",
+            "areaPlaceholder": "例: 110",
+            "layoutLabel": "間取り",
+            "layoutPlaceholder": "物件の間取りを選択",
+            "layoutOptions": {
+                "studio": "ワンルーム",
+                "1b1b": "1ベッド1バス",
+                "2b1b": "2ベッド1バス",
+                "3b2b": "3ベッド2バス",
+                "villa": "ヴィラ"
+            }
+        },
+        "budget": {
+            "title": "2. 予算レベル",
+            "economy": { "label": "エコノミー", "description": "実用的＆高コスパ" },
+            "premium": { "label": "プレミアム", "description": "快適性とパフォーマンス" },
+            "luxury": { "label": "ラグジュアリー", "description": "ハイエンド＆自動化" }
+        },
+        "customization": {
+            "title": "3. カスタマイズ",
+            "floorPlanLabel": "間取り図 (任意)",
+            "floorPlanDescription": "より良い推奨のために、間取り図の画像をアップロードしてください。",
+            "customNeedsLabel": "カスタムニーズ",
+            "customNeedsPlaceholder": "例: 「高齢の親がいるので、自動夜間照明が必要です。」または「主にホームシネマ体験に焦点を当てています。」"
+        },
+        "submitButton": "提案を生成"
+    },
+    "result": {
+        "title": "あなたのスマートホーム設計図",
+        "subtitle": "AIが生成した製品リストの詳細な内訳。",
+        "table": {
+            "image": "画像",
+            "product": "製品",
+            "quantity": "数量",
+            "unitPrice": "単価",
+            "subtotal": "小計"
+        },
+        "totalBudget": "推定総予算",
+        "aiAnalysis": "AIコンサルタント分析"
+    },
+    "errors": {
+        "unknown": "不明なエラーが発生しました。",
+        "generateProposalTitle": "提案の生成中にエラーが発生しました"
+    }
+}
