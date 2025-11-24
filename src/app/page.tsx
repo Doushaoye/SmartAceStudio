@@ -7,6 +7,7 @@ import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carouse
 import Image from 'next/image';
 import { Card, CardContent } from '@/components/ui/card';
 import { ContactSection } from '@/components/contact-section';
+import { BrandLogos } from '@/components/brand-logos';
 
 const showcaseImages = [
   { src: 'https://free.picui.cn/free/2025/11/25/6924968939d33.png', hint: 'living room' },
@@ -66,6 +67,7 @@ export default function Home() {
           </CarouselContent>
         </Carousel>
       </div>
+      <BrandLogos />
        <ContactSection />
     </>
   );
