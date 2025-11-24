@@ -40,6 +40,7 @@ const nextConfig: NextConfig = {
     serverActions: {
       bodySizeLimit: '4mb',
     },
+    allowedDevOrigins: ['*.cloudworkstations.dev'],
   },
   async headers() {
     return [

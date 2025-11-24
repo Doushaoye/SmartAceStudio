@@ -112,7 +112,8 @@ const ProductSelectionOutputSchema = z.object({
   ).describe('The list of selected smart home products.'),
 });
 
-export async function generateSmartHomeProducts(input: GenerateSmartHomeProductsInput): Promise<GenerateSmartHomeProductsOutput> {
+// This function now returns a stream
+export async function generateSmartHomeProductsStream(input: GenerateSmartHomeProductsInput): Promise<ReadableStream<Uint8Array>> {
   const tagContext = getContextFromTags(input);
 
   const selectionPrompt = `你是一位AI智能家居顾问。请分析用户的房产信息、预算和需求，推荐一份智能家居产品清单。请使用中文进行回复。
@@ -154,10 +155,10 @@ ${input.productsJson}
 
 请根据以上所有信息，特别是用户的画像、核心需求和手写需求，并严格遵守所有规则，从提供的产品库中选择适合用户的智能家居产品。在选择时，请综合考虑用户的预算和需求。"room" 和 "reason" 字段必须使用中文。
 
-重要：你必须返回一个只包含 "selectedItems" 键的有效 JSON 对象。
-不要在 JSON 对象前后添加任何其他文本、解释或 markdown 格式。
+重要：你的思考过程和最终的JSON输出都将直接展示给用户。请先输出你的思考过程，例如 "正在分析客厅的需求..."，"为卧室选择灯光..."。
+在你完成所有产品选择后，必须严格按照以下格式输出一个 JSON 对象，且该对象前后不能有任何其他文本或 markdown 格式。这是最后一步。
 
-JSON 对象结构示例:
+最终 JSON 对象结构示例:
 {
   "selectedItems": [
     { "product_id": "1001", "quantity": 1, "room": "客厅", "reason": "中央控制中心" }
@@ -183,48 +184,68 @@ JSON 对象结构示例:
     });
   }
 
-  try {
-    // Step 1: Get product selection
-    const selectionResponse = await openai.chat.completions.create({
+  const stream = await openai.chat.completions.create({
       model: 'Qwen/Qwen3-VL-30B-A3B-Instruct',
       messages: messages,
-      response_format: { type: 'json_object' },
       temperature: 0.5,
-    });
-    
-    const selectionContent = selectionResponse.choices[0].message.content;
-    if (!selectionContent) {
-      throw new Error('AI returned an empty response for product selection.');
+      stream: true,
+  });
+
+  const encoder = new TextEncoder();
+  
+  const readableStream = new ReadableStream({
+    async start(controller) {
+      let fullContent = '';
+      for await (const chunk of stream) {
+          const content = chunk.choices[0]?.delta?.content || '';
+          fullContent += content;
+          controller.enqueue(encoder.encode(content));
+      }
+
+      try {
+        // Find the JSON part of the response
+        const jsonStart = fullContent.lastIndexOf('{');
+        const jsonEnd = fullContent.lastIndexOf('}');
+        if (jsonStart === -1 || jsonEnd === -1 || jsonEnd < jsonStart) {
+            throw new Error("Valid JSON object for selectedItems not found in the AI response.");
+        }
+        const jsonString = fullContent.substring(jsonStart, jsonEnd + 1);
+        const parsedSelection = ProductSelectionOutputSchema.parse(JSON.parse(jsonString));
+
+        // Generate analysis report based on the selection
+        const productMap = new Map(JSON.parse(input.productsJson).map((p: any) => [p.ID, p]));
+        const totalCost = parsedSelection.selectedItems.reduce((acc, item) => {
+            const product = productMap.get(item.product_id);
+            return acc + (product ? product.价格 * item.quantity : 0);
+        }, 0);
+
+        const reportResult = await generateAnalysisReport({
+            budgetLevel: input.budgetLevel,
+            selectedItems: parsedSelection.selectedItems,
+            totalPrice: totalCost,
+            area: input.area,
+            layout: input.layout,
+            customNeeds: input.customNeeds,
+        });
+
+        const finalResult = {
+            selectedItems: parsedSelection.selectedItems,
+            analysisReport: reportResult.analysisReport,
+        };
+
+        // Send the final complete proposal object as a separate chunk with a sentinel
+        const finalPayload = `__PROPOSAL_SENTINEL__=${JSON.stringify(finalResult)}`;
+        controller.enqueue(encoder.encode(finalPayload));
+
+      } catch (e) {
+          console.error("Error processing stream end:", e);
+          const errorMsg = e instanceof Error ? e.message : "An unexpected error occurred.";
+          controller.error(new Error(`Stream processing failed: ${errorMsg}`));
+      }
+
+      controller.close();
     }
+  });
 
-    const parsedSelection = ProductSelectionOutputSchema.parse(JSON.parse(selectionContent));
-
-    // Step 2: Generate analysis report
-    const productMap = new Map(JSON.parse(input.productsJson).map((p: any) => [p.ID, p]));
-    const totalCost = parsedSelection.selectedItems.reduce((acc, item) => {
-        const product = productMap.get(item.product_id);
-        return acc + (product ? product.价格 * item.quantity : 0);
-    }, 0);
-
-    const reportResult = await generateAnalysisReport({
-        budgetLevel: input.budgetLevel,
-        selectedItems: parsedSelection.selectedItems,
-        totalPrice: totalCost,
-        area: input.area,
-        layout: input.layout as any, // Cast because the enum is different
-        customNeeds: input.customNeeds,
-    });
-
-    // Step 3: Combine results
-    const finalResult = {
-        selectedItems: parsedSelection.selectedItems,
-        analysisReport: reportResult.analysisReport,
-    };
-
-    return GenerateSmartHomeProductsOutputSchema.parse(finalResult);
-
-  } catch (error) {
-    console.error("Failed during AI processing:", error);
-    throw new Error('AI returned invalid JSON format or processing failed.');
-  }
+  return readableStream;
 }

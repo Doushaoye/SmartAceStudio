@@ -77,6 +77,8 @@ export function PlanningForm() {
   const { t } = useI18n();
   const { toast } = useToast();
   const [customProductsFile, setCustomProductsFile] = useState<File | null>(null);
+  const [submittedData, setSubmittedData] = useState<FormData | null>(null);
+
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -179,10 +181,11 @@ export function PlanningForm() {
     }
 
     generateProposal(formData);
+    setSubmittedData(formData);
   };
   
-  if (isLoading) {
-    return <LoadingAnimation />;
+  if (isLoading && submittedData) {
+    return <LoadingAnimation formData={submittedData} />;
   }
 
   return (
