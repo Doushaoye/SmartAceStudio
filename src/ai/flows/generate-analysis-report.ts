@@ -30,7 +30,7 @@ const GenerateAnalysisReportInputSchema = z.object({
   ).describe('The list of selected smart home products.'),
   totalPrice: z.number().describe('The total calculated price of the selected items.'),
   area: z.number().describe('The area of the property in square feet.'),
-  layout: z.enum(['Studio', '1B1B', '2B1B', '3B2B', 'Villa']).describe('The layout of the property.'),
+  layout: z.enum(['2r1l1b', '3r2l1b', '3r2l2b', '4r2l2b', '4r2l3b']).describe('The layout of the property.'),
   customNeeds: z.string().describe('The custom needs specified by the user.'),
 });
 export type GenerateAnalysisReportInput = z.infer<typeof GenerateAnalysisReportInputSchema>;
@@ -47,26 +47,25 @@ export async function generateAnalysisReport(input: GenerateAnalysisReportInput)
 
   const prompt = `You are a smart home consultant who provides an analysis report based on the user's smart home plan.
 
-  The user has selected a budget tier of: ${input.budgetLevel}
-  The total price of the selected items is: ${input.totalPrice}
-  The area of the property is: ${input.area}
-  The layout of the property is: ${input.layout}
-  The user's custom needs are: ${input.customNeeds}
+  The user has a property with an area of ${input.area} sqm and a ${input.layout} layout.
+  The selected budget tier is '${input.budgetLevel}'.
+  The total price of the selected items is: ${input.totalPrice}.
+  The user's custom needs are: "${input.customNeeds}".
 
-  Here are the selected items:
+  Here are the selected items that form the plan:
   ${selectedItemsString}
 
-  Your analysis report should explain the following in markdown format:
-  1. What automation functions does this plan achieve compared to a non-smart home? (e.g., automated lighting, scheduled curtains, etc.)
-  2. What features were compromised due to budget?
-  3. Suggestions for upgrades if the budget allows.
-  4. Ways to save money.
+  Please write a concise analysis report in Chinese, using markdown format. The report should cover these four points:
+  1.  **方案价值**: 简单说明与非智能家居相比，这个方案实现了哪些核心的自动化功能 (例如: 自动照明, 定时窗帘等)?
+  2.  **预算权衡**: 基于预算等级，哪些更高级的功能或产品体验打了折扣?
+  3.  **升级建议**: 如果预算更充足，可以从哪些方面进行升级，可以推荐具体产品品类?
+  4.  **省钱技巧**: 有哪些可以节省成本的替代方案或技巧?
 
-  Return the analysis report as a markdown string.
-  Make sure to mention specific products or categories of products in the report.
-  Do not include any introductory or concluding sentences, just the analysis report in markdown format.
-  
-  Please provide the output as a JSON object with a single key "analysisReport" containing the markdown string.
+  IMPORTANT:
+  - Your entire response must be a single JSON object.
+  - The JSON object must have one key: "analysisReport".
+  - The value of "analysisReport" must be a markdown string containing the report.
+  - Do not add any introductory or concluding text outside of the markdown report itself.
   `;
 
   const response = await openai.chat.completions.create({
@@ -83,13 +82,13 @@ export async function generateAnalysisReport(input: GenerateAnalysisReportInput)
 
   try {
     const parsedJson = JSON.parse(content);
+    // Add validation for the parsed JSON
+    if (typeof parsedJson.analysisReport !== 'string') {
+       throw new Error('The "analysisReport" key is missing or not a string.');
+    }
     return GenerateAnalysisReportOutputSchema.parse(parsedJson);
   } catch (error) {
-    console.error("Failed to parse AI response:", error);
-    // If parsing fails, we can try to return the raw content if it looks like the report
-    if (typeof content === 'string' && (content.includes('省钱') || content.includes('升级'))) {
-        return { analysisReport: content };
-    }
-    throw new Error('AI returned invalid JSON format.');
+    console.error("Failed to parse AI response for analysis report:", error, content);
+    throw new Error('AI returned invalid JSON format for analysis report.');
   }
 }

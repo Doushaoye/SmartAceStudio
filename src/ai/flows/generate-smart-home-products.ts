@@ -101,11 +101,21 @@ function getContextFromTags(input: GenerateSmartHomeProductsInput): string {
     return context;
 }
 
+const ProductSelectionOutputSchema = z.object({
+  selectedItems: z.array(
+    z.object({
+      product_id: z.string().describe('The ID of the selected product.'),
+      quantity: z.number().describe('The quantity of the product needed.'),
+      room: z.string().describe('The room where the product will be used.'),
+      reason: z.string().describe('The reason for selecting this product.'),
+    })
+  ).describe('The list of selected smart home products.'),
+});
 
 export async function generateSmartHomeProducts(input: GenerateSmartHomeProductsInput): Promise<GenerateSmartHomeProductsOutput> {
   const tagContext = getContextFromTags(input);
 
-  const prompt = `你是一位AI智能家居顾问。请分析用户的房产信息、预算和需求，推荐一份智能家居产品清单。请使用中文进行回复。
+  const selectionPrompt = `你是一位AI智能家居顾问。请分析用户的房产信息、预算和需求，推荐一份智能家居产品清单。请使用中文进行回复。
 
 房产信息:
 面积: ${input.area} 平方米
@@ -137,22 +147,14 @@ ${input.productsJson}
 
 请根据以上所有信息，特别是用户的画像、核心需求和手写需求，并严格遵守【生态平台选择规则】、【预算选择规则】和【产品选择规则】，从提供的产品库中选择适合用户的智能家居产品。在选择时，请综合考虑用户的预算和需求。"room" 和 "reason" 字段必须使用中文。
 
-重要：你必须返回一个有效的 JSON 对象。
-该对象可以包含 "selectedItems" 和 "analysisReport" 两个键，或者仅包含 "selectedItems" 键。
+重要：你必须返回一个只包含 "selectedItems" 键的有效 JSON 对象。
 不要在 JSON 对象前后添加任何其他文本、解释或 markdown 格式。
-
-如果包含 "analysisReport"，其内容必须是中文的Markdown格式，并解释：
-1.  与非智能家居相比，此方案实现了哪些自动化功能？
-2.  由于预算限制，哪些功能打了折扣？
-3.  如果预算允许，有哪些升级建议？
-4.  有哪些省钱的方法？
 
 JSON 对象结构示例:
 {
   "selectedItems": [
     { "product_id": "1001", "quantity": 1, "room": "客厅", "reason": "中央控制中心" }
-  ],
-  "analysisReport": "Markdown格式的中文分析报告..."
+  ]
 }
 `;
 
@@ -160,7 +162,7 @@ JSON 对象结构示例:
     {
       role: 'user',
       content: [
-        { type: 'text', text: prompt },
+        { type: 'text', text: selectionPrompt },
       ],
     },
   ];
@@ -174,46 +176,48 @@ JSON 对象结构示例:
     });
   }
 
-  const response = await openai.chat.completions.create({
-    model: 'Qwen/Qwen3-VL-8B-Instruct',
-    messages: messages,
-    temperature: 0.5,
-  });
-  
-  const content = response.choices[0].message.content;
-  if (!content) {
-    throw new Error('AI returned an empty response.');
-  }
-
   try {
-    const jsonMatch = content.match(/```(json)?\n?([\s\S]*?)\n?```/);
-    const jsonString = jsonMatch ? jsonMatch[2] : content;
-    const parsedJson = JSON.parse(jsonString);
-
-    if (!parsedJson.analysisReport) {
-        console.log("AI did not return an analysis report. Generating one separately.");
-        
-        const productMap = new Map(JSON.parse(input.productsJson).map((p: any) => [p.id, p]));
-
-        const totalCost = parsedJson.selectedItems.reduce((acc: number, item: { product_id: string, quantity: number }) => {
-            const product = productMap.get(item.product_id);
-            return acc + (product ? product.价格 * item.quantity : 0);
-        }, 0);
-
-        const reportResult = await generateAnalysisReport({
-            budgetLevel: input.budgetLevel,
-            selectedItems: parsedJson.selectedItems,
-            totalPrice: totalCost,
-            area: input.area,
-            layout: input.layout as any, // Cast because the enum is different
-            customNeeds: input.customNeeds,
-        });
-        parsedJson.analysisReport = reportResult.analysisReport;
+    // Step 1: Get product selection
+    const selectionResponse = await openai.chat.completions.create({
+      model: 'Qwen/Qwen3-VL-8B-Instruct',
+      messages: messages,
+      response_format: { type: 'json_object' },
+      temperature: 0.5,
+    });
+    
+    const selectionContent = selectionResponse.choices[0].message.content;
+    if (!selectionContent) {
+      throw new Error('AI returned an empty response for product selection.');
     }
 
-    return GenerateSmartHomeProductsOutputSchema.parse(parsedJson);
+    const parsedSelection = ProductSelectionOutputSchema.parse(JSON.parse(selectionContent));
+
+    // Step 2: Generate analysis report
+    const productMap = new Map(JSON.parse(input.productsJson).map((p: any) => [p.ID, p]));
+    const totalCost = parsedSelection.selectedItems.reduce((acc, item) => {
+        const product = productMap.get(item.product_id);
+        return acc + (product ? product.价格 * item.quantity : 0);
+    }, 0);
+
+    const reportResult = await generateAnalysisReport({
+        budgetLevel: input.budgetLevel,
+        selectedItems: parsedSelection.selectedItems,
+        totalPrice: totalCost,
+        area: input.area,
+        layout: input.layout as any, // Cast because the enum is different
+        customNeeds: input.customNeeds,
+    });
+
+    // Step 3: Combine results
+    const finalResult = {
+        selectedItems: parsedSelection.selectedItems,
+        analysisReport: reportResult.analysisReport,
+    };
+
+    return GenerateSmartHomeProductsOutputSchema.parse(finalResult);
+
   } catch (error) {
-    console.error("Failed to parse AI response:", content, error);
+    console.error("Failed during AI processing:", error);
     throw new Error('AI returned invalid JSON format or processing failed.');
   }
 }

@@ -15,7 +15,6 @@ function toChineseKeys(product: any, isCustom: boolean) {
     '品牌': product.brand,
     '品类': product.category,
     '价格': product.price,
-    '预算等级': product.budget_level,
     '生态': product.ecosystem,
     '描述': product.description,
   };
