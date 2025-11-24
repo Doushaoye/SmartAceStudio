@@ -8,7 +8,14 @@ export async function generateProposalAction(
   formData: FormData
 ): Promise<{ proposal?: Proposal; error?: string }> {
   try {
-    const productsJson = JSON.stringify(products);
+    const simplifiedProducts = products.map(({ id, name, category, price, budget_level }) => ({
+      id,
+      name,
+      category,
+      price,
+      budget_level
+    }));
+    const productsJson = JSON.stringify(simplifiedProducts);
 
     const area = Number(formData.get('area'));
     const layout = formData.get('layout') as '2r1l1b' | '3r2l1b' | '3r2l2b' | '4r2l2b' | '4r2l3b';

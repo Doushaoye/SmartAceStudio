@@ -14,7 +14,7 @@ import {z} from 'genkit';
 const GenerateSmartHomeProductsInputSchema = z.object({
   area: z.number().describe('The area of the property in square feet.'),
   layout: z
-    .enum(['2R1L1B', '3R2L1B', '3R2L2B', '4R2L2B', '4R2L3B'])
+    .enum(['2r1l1b', '3r2l1b', '3r2l2b', '4r2l2b', '4r2l3b'])
     .describe('The layout of the property.'),
   budgetLevel: z.enum(['economy', 'premium', 'luxury']).describe('The budget tier selected by the user.'),
   floorPlanDataUri: z
@@ -95,4 +95,3 @@ const generateSmartHomeProductsFlow = ai.defineFlow(
     return output!;
   }
 );
-
