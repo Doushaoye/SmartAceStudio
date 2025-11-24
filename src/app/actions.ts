@@ -4,6 +4,7 @@ import { generateSmartHomeProducts } from '@/ai/flows/generate-smart-home-produc
 import { type Proposal } from '@/lib/products';
 import type { Product } from '@/lib/products';
 import productsData from '@/data/products.json';
+import Papa from 'papaparse';
 
 const products: Product[] = productsData as Product[];
 
@@ -34,17 +35,41 @@ export async function generateProposalAction(
     let combinedProducts = [...defaultSimplifiedProducts];
     let allProductsForEnrichment: Product[] = [...products];
 
-    const customProductsJson = formData.get('productsJson') as string;
-    if (customProductsJson) {
+    const customProductsCsv = formData.get('productsCsv') as string;
+
+    if (customProductsCsv) {
       try {
-        const customProducts: Product[] = JSON.parse(customProductsJson);
+        const parseResult = Papa.parse(customProductsCsv, {
+          header: true,
+          skipEmptyLines: true,
+        });
+
+        if (parseResult.errors.length > 0) {
+            console.error("CSV parsing errors:", parseResult.errors);
+            throw new Error(`CSV文件解析失败: ${parseResult.errors.map(e => e.message).join(', ')}`);
+        }
+
+        const customProducts: Product[] = parseResult.data.map((row: any) => {
+            return {
+                id: `USER-${crypto.randomUUID()}`, // Assign new UUID
+                name: row['产品名称'],
+                brand: row['品牌'],
+                category: row['品类'],
+                price: Number(row['价格']),
+                budget_level: row['预算等级'] as 'economy' | 'premium' | 'luxury',
+                ecosystem: row['生态平台(用;分隔)']?.split(';').map((e: string) => e.trim()).filter(Boolean) || [],
+                description: row['产品描述'],
+                imageUrl: `https://picsum.photos/seed/${crypto.randomUUID()}/400/400`,
+            }
+        });
+        
         const simplifiedCustomProducts = customProducts.map(p => toChineseKeys(p, true));
         
         combinedProducts = [...simplifiedCustomProducts, ...defaultSimplifiedProducts];
         allProductsForEnrichment = [...customProducts, ...products];
 
       } catch (e) {
-        console.error("Failed to parse or process custom products JSON", e);
+        console.error("Failed to parse or process custom products CSV", e);
         // Continue with default products if custom ones are invalid
       }
     }

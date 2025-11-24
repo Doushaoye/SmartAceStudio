@@ -12,12 +12,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { useProposal } from '@/context/proposal-context';
-import { DollarSign, Zap, Gem, ArrowRight, FileUp, User, Heart, Baby, Accessibility, Cat, Download, Upload, FileJson } from 'lucide-react';
+import { DollarSign, Zap, Gem, ArrowRight, FileUp, User, Heart, Baby, Accessibility, Cat, Download, Upload, FileText } from 'lucide-react';
 import { useI18n } from '@/context/i18n-context';
 import { LoadingAnimation } from './loading-animation';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import Papa from 'papaparse';
+
 
 const householdProfileOptions = [
   { label: "独居青年", value: "single", icon: User },
@@ -53,19 +55,6 @@ const ecosystemOptions = [
     { label: "HomeKit", value: "HomeKit" },
 ];
 
-const CustomProductSchema = z.object({
-  name: z.string().min(1, "产品名称不能为空"),
-  brand: z.string().min(1, "品牌不能为空"),
-  category: z.string().min(1, "品类不能为空"),
-  price: z.coerce.number().min(0, "价格不能为负数"),
-  budget_level: z.enum(['economy', 'premium', 'luxury']),
-  ecosystem: z.array(z.string()).min(1, "生态平台至少需要一个"),
-  description: z.string().min(1, "产品描述不能为空"),
-}).passthrough(); // Allow comment fields
-
-const CustomProductsStoreSchema = z.array(CustomProductSchema);
-
-
 const formSchema = z.object({
   area: z.coerce.number().min(1, 'Area must be at least 1 sq ft.'),
   layout: z.enum(['2r1l1b', '3r2l1b', '3r2l2b', '4r2l2b', '4r2l3b'], { required_error: 'Please select a layout.'}),
@@ -76,36 +65,12 @@ const formSchema = z.object({
   ecosystem: z.string().optional(),
   customNeeds: z.string().optional(),
   floorPlan: z.instanceof(File).optional(),
-  customProductsJson: z.string().optional(),
+  customProductsCsv: z.string().optional(),
 });
 
-const templateJson = [
-    {
-        "_comment_name": "产品名称 (必填, 字符串)",
-        "name": "自定义产品A",
-        "_comment_brand": "品牌 (必填, 字符串)",
-        "brand": "自定义品牌",
-        "_comment_category": "品类 (必填, 字符串, 如 '网关', '开关', '灯光' 等)",
-        "category": "网关",
-        "_comment_price": "价格 (必填, 数字)",
-        "price": 199,
-        "_comment_budget_level": "预算等级 (必填, 'economy', 'premium', 或 'luxury')",
-        "budget_level": "economy",
-        "_comment_ecosystem": "生态平台 (必填, 数组, 可填 '米家', 'HomeKit', 'Aqara' 等)",
-        "ecosystem": ["米家", "HomeKit"],
-        "_comment_description": "产品功能描述 (必填, 字符串, 描述产品核心功能)",
-        "description": "这是一个用户自定义的产品示例，用于家庭的中央控制。"
-    },
-    {
-        "name": "自定义灯泡B",
-        "brand": "飞利浦",
-        "category": "灯光",
-        "price": 88,
-        "budget_level": "premium",
-        "ecosystem": ["Hue"],
-        "description": "高品质彩色智能灯泡，可调节亮度和颜色。"
-    }
-];
+const csvTemplateHeader = "产品名称,品牌,品类,价格,预算等级,生态平台(用;分隔),产品描述";
+const csvTemplateContent = `${csvTemplateHeader}\n自定义产品A,自定义品牌,网关,199,economy,"米家;HomeKit",这是一个用户自定义的产品示例，用于家庭的中央控制。\n自定义灯泡B,飞利浦,灯光,88,premium,Hue,高品质彩色智能灯泡，可调节亮度和颜色。`;
+
 
 export function PlanningForm() {
   const { isLoading, generateProposal } = useProposal();
@@ -123,17 +88,16 @@ export function PlanningForm() {
       lightingStyle: 'modern-simple',
       ecosystem: '米家',
       customNeeds: '',
-      customProductsJson: '',
+      customProductsCsv: '',
     },
   });
 
   const handleDownloadTemplate = () => {
-    const jsonString = JSON.stringify(templateJson, null, 2);
-    const blob = new Blob([jsonString], { type: 'application/json' });
+    const blob = new Blob([`\uFEFF${csvTemplateContent}`], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'custom-products-template.json';
+    a.download = 'custom-products-template.csv';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -147,40 +111,34 @@ export function PlanningForm() {
       reader.onload = (e) => {
         try {
           const content = e.target?.result as string;
-          const parsed = JSON.parse(content);
-          
-          const validatedProducts = CustomProductsStoreSchema.parse(parsed);
-
-          const productsWithIds = validatedProducts.map(p => {
-            const cleanProduct: any = {};
-            // Filter out comment fields
-            for (const key in p) {
-              if (!key.startsWith('_comment')) {
-                cleanProduct[key] = p[key as keyof typeof p];
-              }
-            }
-            return {
-              ...cleanProduct,
-              id: `USER-${crypto.randomUUID()}`
-            }
+           const parseResult = Papa.parse(content, {
+            header: true,
+            skipEmptyLines: true,
           });
 
-          form.setValue('customProductsJson', JSON.stringify(productsWithIds));
+          if (parseResult.errors.length > 0) {
+             throw new Error(`CSV文件表头或格式错误: ${parseResult.errors[0].message}`);
+          }
+
+          if (!parseResult.meta.fields || !csvTemplateHeader.split(',').every(h => parseResult.meta.fields?.includes(h))) {
+             throw new Error(`CSV文件表头不匹配。需要包含: ${csvTemplateHeader}`);
+          }
+          
+          form.setValue('customProductsCsv', content);
           setCustomProductsFile(file);
           toast({
             title: "上传成功",
             description: `产品库文件 "${file.name}" 已成功上传并验证。`,
           });
         } catch (error) {
-          console.error("JSON validation error:", error);
-          form.setValue('customProductsJson', '');
+          console.error("CSV validation error:", error);
+          form.setValue('customProductsCsv', '');
           setCustomProductsFile(null);
           event.target.value = ''; // Reset file input
           
-          let errorMessage = "上传的JSON文件格式不符合要求，请检查后重试。";
-          if (error instanceof z.ZodError) {
-             const firstError = error.errors[0];
-             errorMessage = `文件格式错误: [${firstError.path.join('.')}] ${firstError.message}`;
+          let errorMessage = "上传的CSV文件格式不符合要求，请检查后重试。";
+          if (error instanceof Error) {
+             errorMessage = error.message;
           }
 
           toast({
@@ -190,7 +148,7 @@ export function PlanningForm() {
           });
         }
       };
-      reader.readAsText(file);
+      reader.readAsText(file, 'utf-8');
     }
   };
 
@@ -215,8 +173,8 @@ export function PlanningForm() {
       formData.append('floorPlan', values.floorPlan);
     }
     
-    if (values.customProductsJson) {
-      formData.append('productsJson', values.customProductsJson);
+    if (values.customProductsCsv) {
+      formData.append('productsCsv', values.customProductsCsv);
     }
 
     generateProposal(formData);
@@ -433,28 +391,37 @@ export function PlanningForm() {
                     )}
                     />
                     <FormField
-                    control={form.control}
-                    name="ecosystem"
-                    render={({ field }) => (
+                      control={form.control}
+                      name="ecosystem"
+                      render={({ field }) => (
                         <FormItem>
-                            <FormLabel>优先智能生态</FormLabel>
-                            <RadioGroup
-                                onValueChange={field.onChange}
-                                defaultValue={field.value}
-                                className="flex flex-wrap gap-x-4 gap-y-2 pt-2"
-                            >
-                                {ecosystemOptions.map(option => (
-                                <FormItem key={option.value} className="flex items-center space-x-2">
-                                    <FormControl>
-                                    <RadioGroupItem value={option.value} id={`eco-${option.value}`} />
-                                    </FormControl>
-                                    <Label htmlFor={`eco-${option.value}`}>{option.label}</Label>
-                                </FormItem>
-                                ))}
-                            </RadioGroup>
-                            <FormMessage />
+                          <FormLabel>优先智能生态</FormLabel>
+                          <RadioGroup
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            className="flex flex-wrap gap-x-4 gap-y-2 pt-2"
+                          >
+                            {ecosystemOptions.map(option => (
+                              <FormItem key={option.value} className="flex items-center space-x-2">
+                                <FormControl>
+                                  <RadioGroupItem 
+                                    value={option.value} 
+                                    id={`eco-${option.value}`} 
+                                    disabled={option.value !== '米家'}
+                                  />
+                                </FormControl>
+                                <Label 
+                                  htmlFor={`eco-${option.value}`}
+                                  className={cn(option.value !== '米家' && "text-muted-foreground/50 cursor-not-allowed")}
+                                >
+                                  {option.label}
+                                </Label>
+                              </FormItem>
+                            ))}
+                          </RadioGroup>
+                          <FormMessage />
                         </FormItem>
-                    )}
+                      )}
                     />
                 </div>
             </div>
@@ -463,7 +430,7 @@ export function PlanningForm() {
                 <h3 className="font-semibold text-lg font-headline">自定义产品库 (可选)</h3>
                  <div className="p-4 border rounded-lg space-y-4 bg-muted/20">
                     <FormDescription>
-                        您可以上传自己的产品库JSON文件，AI将优先使用您提供的产品进行方案设计。
+                        您可以上传自己的产品库CSV表格文件，AI将优先使用您提供的产品进行方案设计。
                     </FormDescription>
                     <div className="flex flex-col sm:flex-row gap-4">
                         <Button type="button" variant="outline" onClick={handleDownloadTemplate} className="w-full sm:w-auto">
@@ -473,16 +440,16 @@ export function PlanningForm() {
                         <div className="relative w-full sm:w-auto">
                             <Button type="button" variant="outline" asChild className="w-full">
                                 <Label htmlFor="custom-products-upload" className="cursor-pointer">
-                                    <Upload className="mr-2 h-4 w-4" />
+                                    <Upload className="mr-2 h-4 w-f`ull" />
                                     上传产品库
                                 </Label>
                             </Button>
-                            <Input id="custom-products-upload" type="file" accept=".json" className="sr-only" onChange={handleFileUpload} />
+                            <Input id="custom-products-upload" type="file" accept=".csv" className="sr-only" onChange={handleFileUpload} />
                         </div>
                     </div>
                     {customProductsFile && (
                         <div className="flex items-center gap-2 text-sm text-muted-foreground p-2 bg-background rounded-md border">
-                            <FileJson className="h-5 w-5 text-primary" />
+                            <FileText className="h-5 w-5 text-primary" />
                             <span>已上传: <span className="font-medium text-foreground">{customProductsFile.name}</span></span>
                         </div>
                     )}
