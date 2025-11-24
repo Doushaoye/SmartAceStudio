@@ -125,6 +125,13 @@ export async function generateSmartHomeProducts(input: GenerateSmartHomeProducts
 生态平台选择规则 (最重要):
 用户选择的优先智能生态是: 【${input.ecosystem}】。你选择的所有产品，其“生态”字段中必须包含【${input.ecosystem}】这个标签。绝对不能选择任何不兼容该生态的产品。
 
+智能开关选择规则 (最重要):
+1.  全屋都需要配置智能开关，不要为了省钱而选择用普通开关替代智能开关。
+2.  卧室、客厅区域至少要配置一对3键开关实现灯光的双控，如果这个空间还有电动窗帘则需要考虑补充更多的开关。
+3.  卫生间，厨房区域配置1键或2键开关即可。
+4.  阳台区域因为有电动窗帘和晾衣架，建议用三键开关。
+5.  玄关区域推荐使用3键或者智能屏来实现回家离家模式等场景控制需求。
+
 预算选择规则 (重要):
 - 如果预算是 'luxury' (豪华), 你可以使用 'luxury', 'premium', 'economy' 三个等级的产品。
 - 如果预算是 'premium' (高级), 你可以使用 'premium' 和 'economy' 等级的产品。
@@ -142,10 +149,10 @@ ${input.customNeeds || "无"}
 
 ${input.floorPlanDataUri ? `平面图: [Image Attached]` : ''}
 
-产品库 (你必须从此列表里选择产品，产品属性描述均为中文，特别是要遵守【生态平台选择规则】):
+产品库 (你必须从此列表里选择产品，产品属性描述均为中文，特别是要遵守【生态平台选择规则】和【智能开关选择规则】):
 ${input.productsJson}
 
-请根据以上所有信息，特别是用户的画像、核心需求和手写需求，并严格遵守【生态平台选择规则】、【预算选择规则】和【产品选择规则】，从提供的产品库中选择适合用户的智能家居产品。在选择时，请综合考虑用户的预算和需求。"room" 和 "reason" 字段必须使用中文。
+请根据以上所有信息，特别是用户的画像、核心需求和手写需求，并严格遵守所有规则，从提供的产品库中选择适合用户的智能家居产品。在选择时，请综合考虑用户的预算和需求。"room" 和 "reason" 字段必须使用中文。
 
 重要：你必须返回一个只包含 "selectedItems" 键的有效 JSON 对象。
 不要在 JSON 对象前后添加任何其他文本、解释或 markdown 格式。
@@ -179,7 +186,7 @@ JSON 对象结构示例:
   try {
     // Step 1: Get product selection
     const selectionResponse = await openai.chat.completions.create({
-      model: 'Qwen/Qwen3-VL-8B-Instruct',
+      model: 'Qwen/Qwen3-VL-30B-A3B-Instruct',
       messages: messages,
       response_format: { type: 'json_object' },
       temperature: 0.5,
