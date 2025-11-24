@@ -1,14 +1,11 @@
 import {genkit} from 'genkit';
-import {openAI} from 'genkitx-openai';
+import {googleAI} from '@genkit-ai/google-genai';
 import {config} from 'dotenv';
 
 config();
 
 export const ai = genkit({
   plugins: [
-    openAI({
-      apiKey: process.env.SILICONFLOW_API_KEY,
-      baseUrl: 'https://api.siliconflow.cn/v1',
-    }),
+    googleAI(),
   ],
 });

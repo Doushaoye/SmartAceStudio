@@ -1,15 +1,20 @@
 'use server';
 
 /**
- * @fileOverview This file defines the Genkit flow for generating smart home product recommendations based on user inputs.
+ * @fileOverview This file defines the flow for generating smart home product recommendations based on user inputs, using a direct OpenAI-compatible API call.
  *
  * - generateSmartHomeProducts - A function that orchestrates the smart home product recommendation process.
  * - GenerateSmartHomeProductsInput - The input type for the generateSmartHomeProducts function.
  * - GenerateSmartHomeProductsOutput - The return type for the generateSmartHomeProducts function.
  */
 
-import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import { z } from 'zod';
+import OpenAI from 'openai';
+
+const openai = new OpenAI({
+  apiKey: process.env.SILICONFLOW_API_KEY,
+  baseURL: 'https://api.siliconflow.cn/v1',
+});
 
 const GenerateSmartHomeProductsInputSchema = z.object({
   area: z.number().describe('The area of the property in square feet.'),
@@ -42,27 +47,17 @@ const GenerateSmartHomeProductsOutputSchema = z.object({
 export type GenerateSmartHomeProductsOutput = z.infer<typeof GenerateSmartHomeProductsOutputSchema>;
 
 export async function generateSmartHomeProducts(input: GenerateSmartHomeProductsInput): Promise<GenerateSmartHomeProductsOutput> {
-  return generateSmartHomeProductsFlow(input);
-}
-
-const prompt = ai.definePrompt({
-  name: 'generateSmartHomeProductsPrompt',
-  model: 'THUDM/GLM-4.1V-9B-Thinking',
-  input: {schema: GenerateSmartHomeProductsInputSchema},
-  output: {schema: GenerateSmartHomeProductsOutputSchema},
-  prompt: `你是一位AI智能家居顾问。请分析用户的房产信息、预算和需求，推荐一份智能家居产品清单。请使用中文进行回复。
+  const prompt = `你是一位AI智能家居顾问。请分析用户的房产信息、预算和需求，推荐一份智能家居产品清单。请使用中文进行回复。
 
 房产信息:
-面积: {{{area}}} 平方米
-户型: {{{layout}}}
-预算等级: {{{budgetLevel}}}
-定制需求: {{{customNeeds}}}
-{{#if floorPlanDataUri}}
-平面图: {{media url=floorPlanDataUri}}
-{{/if}}
+面积: ${input.area} 平方米
+户型: ${input.layout}
+预算等级: ${input.budgetLevel}
+定制需求: ${input.customNeeds}
+${input.floorPlanDataUri ? `平面图: [Image Attached]` : ''}
 
 可选产品列表:
-{{{productsJson}}}
+${input.productsJson}
 
 请根据以上信息，选择适合用户的智能家居产品。在选择时，请综合考虑用户的预算和需求。"room" 和 "reason" 字段必须使用中文。
 
@@ -79,17 +74,43 @@ analysis_report必须是中文的Markdown格式，并解释：
 2.  如果预算允许，有哪些升级建议？
 3.  有哪些省钱的方法？
 
-确保返回的JSON是有效的，并且不包含任何Markdown包装。`,
-});
+确保返回的JSON是有效的，并且不包含任何Markdown包装。`;
 
-const generateSmartHomeProductsFlow = ai.defineFlow(
-  {
-    name: 'generateSmartHomeProductsFlow',
-    inputSchema: GenerateSmartHomeProductsInputSchema,
-    outputSchema: GenerateSmartHomeProductsOutputSchema,
-  },
-  async input => {
-    const {output} = await prompt(input);
-    return output!;
+  const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
+    {
+      role: 'user',
+      content: [
+        { type: 'text', text: prompt },
+      ],
+    },
+  ];
+
+  if (input.floorPlanDataUri) {
+    (messages[0].content as any[]).push({
+      type: 'image_url',
+      image_url: {
+        url: input.floorPlanDataUri,
+      },
+    });
   }
-);
+
+  const response = await openai.chat.completions.create({
+    model: 'THUDM/GLM-4.1V-9B-Thinking',
+    messages: messages,
+    response_format: { type: 'json_object' },
+    temperature: 0.5,
+  });
+  
+  const content = response.choices[0].message.content;
+  if (!content) {
+    throw new Error('AI returned an empty response.');
+  }
+
+  try {
+    const parsedJson = JSON.parse(content);
+    return GenerateSmartHomeProductsOutputSchema.parse(parsedJson);
+  } catch (error) {
+    console.error("Failed to parse AI response:", error);
+    throw new Error('AI returned invalid JSON format.');
+  }
+}

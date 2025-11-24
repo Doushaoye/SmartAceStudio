@@ -9,8 +9,14 @@
  * - GenerateAnalysisReportOutput - The return type for the generateAnalysisReport function.
  */
 
-import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import { z } from 'zod';
+import OpenAI from 'openai';
+
+const openai = new OpenAI({
+  apiKey: process.env.SILICONFLOW_API_KEY,
+  baseURL: 'https://api.siliconflow.cn/v1',
+});
+
 
 const GenerateAnalysisReportInputSchema = z.object({
   budgetLevel: z.enum(['economy', 'premium', 'luxury']).describe('The budget tier selected by the user.'),
@@ -35,26 +41,20 @@ const GenerateAnalysisReportOutputSchema = z.object({
 export type GenerateAnalysisReportOutput = z.infer<typeof GenerateAnalysisReportOutputSchema>;
 
 export async function generateAnalysisReport(input: GenerateAnalysisReportInput): Promise<GenerateAnalysisReportOutput> {
-  return generateAnalysisReportFlow(input);
-}
+  const selectedItemsString = input.selectedItems.map(item => 
+    `- Product ID: ${item.product_id}, Quantity: ${item.quantity}, Room: ${item.room}, Reason: ${item.reason}`
+  ).join('\n');
 
-const prompt = ai.definePrompt({
-  name: 'generateAnalysisReportPrompt',
-  model: 'THUDM/GLM-4.1V-9B-Thinking',
-  input: {schema: GenerateAnalysisReportInputSchema},
-  output: {schema: GenerateAnalysisReportOutputSchema},
-  prompt: `You are a smart home consultant who provides an analysis report based on the user's smart home plan.
+  const prompt = `You are a smart home consultant who provides an analysis report based on the user's smart home plan.
 
-  The user has selected a budget tier of: {{{budgetLevel}}}
-  The total price of the selected items is: {{{totalPrice}}}
-  The area of the property is: {{{area}}}
-  The layout of the property is: {{{layout}}}
-  The user's custom needs are: {{{customNeeds}}}
+  The user has selected a budget tier of: ${input.budgetLevel}
+  The total price of the selected items is: ${input.totalPrice}
+  The area of the property is: ${input.area}
+  The layout of the property is: ${input.layout}
+  The user's custom needs are: ${input.customNeeds}
 
   Here are the selected items:
-  {{#each selectedItems}}
-  - Product ID: {{{product_id}}}, Quantity: {{{quantity}}}, Room: {{{room}}}, Reason: {{{reason}}}
-  {{/each}}
+  ${selectedItemsString}
 
   Your analysis report should explain the following:
   1.  What features were compromised due to budget?
@@ -64,17 +64,31 @@ const prompt = ai.definePrompt({
   Return the analysis report as a markdown string.
   Make sure to mention specific products or categories of products in the report.
   Do not include any introductory or concluding sentences, just the analysis report in markdown format.
-  `,
-});
+  
+  Please provide the output as a JSON object with a single key "analysisReport" containing the markdown string.
+  `;
 
-const generateAnalysisReportFlow = ai.defineFlow(
-  {
-    name: 'generateAnalysisReportFlow',
-    inputSchema: GenerateAnalysisReportInputSchema,
-    outputSchema: GenerateAnalysisReportOutputSchema,
-  },
-  async input => {
-    const {output} = await prompt(input);
-    return {analysisReport: output!.analysisReport!};
+  const response = await openai.chat.completions.create({
+    model: 'THUDM/GLM-4.1V-9B-Thinking',
+    messages: [{ role: 'user', content: prompt }],
+    response_format: { type: 'json_object' },
+    temperature: 0.5,
+  });
+
+  const content = response.choices[0].message.content;
+  if (!content) {
+    throw new Error('AI returned an empty response.');
   }
-);
+
+  try {
+    const parsedJson = JSON.parse(content);
+    return GenerateAnalysisReportOutputSchema.parse(parsedJson);
+  } catch (error) {
+    console.error("Failed to parse AI response:", error);
+    // If parsing fails, we can try to return the raw content if it looks like the report
+    if (typeof content === 'string' && (content.includes('省钱') || content.includes('升级'))) {
+        return { analysisReport: content };
+    }
+    throw new Error('AI returned invalid JSON format.');
+  }
+}
