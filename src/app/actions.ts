@@ -8,20 +8,39 @@ export async function generateProposalAction(
   formData: FormData
 ): Promise<{ proposal?: Proposal; error?: string }> {
   try {
-    // If user provides a custom product list, use it. Otherwise, use the default.
-    let productsJson = formData.get('productsJson') as string;
-    if (!productsJson) {
-      const simplifiedProducts = products.map(({ id, name, category, price, budget_level, brand, description }) => ({
-        id,
-        name,
-        brand,
-        category,
-        price,
-        budget_level,
-        description
-      }));
-      productsJson = JSON.stringify(simplifiedProducts);
+    const defaultSimplifiedProducts = products.map(({ id, name, category, price, budget_level, brand, description }) => ({
+      'id': id,
+      '名称': name,
+      '品牌': brand,
+      '品类': category,
+      '价格': price,
+      '预算等级': budget_level,
+      '描述': description
+    }));
+
+    let combinedProducts = [...defaultSimplifiedProducts];
+
+    const customProductsJson = formData.get('productsJson') as string;
+    if (customProductsJson) {
+      try {
+        const customProducts = JSON.parse(customProductsJson);
+        const simplifiedCustomProducts = customProducts.map((p: any) => ({
+          'id': p.id,
+          '名称': p.name,
+          '品牌': p.brand,
+          '品类': p.category,
+          '价格': p.price,
+          '预算等级': p.budget_level,
+          '描述': p.description
+        }));
+        combinedProducts = [...defaultSimplifiedProducts, ...simplifiedCustomProducts];
+      } catch (e) {
+        console.error("Failed to parse or process custom products JSON", e);
+        // Continue with default products if custom ones are invalid
+      }
     }
+    
+    const productsJson = JSON.stringify(combinedProducts);
 
 
     const area = Number(formData.get('area'));
@@ -56,7 +75,7 @@ export async function generateProposalAction(
     }
     
     // The product map should be a combination of default and custom products
-    const allProducts = [...products, ...(productsJson ? JSON.parse(productsJson) : [])];
+    const allProducts = [...products, ...(customProductsJson ? JSON.parse(customProductsJson) : [])];
     const productMap = new Map<string, Product>(allProducts.map((p) => [p.id, p]));
 
     const enrichedItems = aiResult.selectedItems.map(item => {
