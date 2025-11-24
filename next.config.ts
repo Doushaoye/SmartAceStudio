@@ -30,6 +30,21 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '4mb',
+    },
+  },
+  async headers() {
+    return [
+        {
+            source: "/:path*",
+            headers: [
+                { key: "x-action-timeout", value: "120" },
+            ],
+        },
+    ];
+  },
 };
 
 export default nextConfig;
