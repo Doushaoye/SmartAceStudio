@@ -11,5 +11,4 @@ export const ai = genkit({
       baseUrl: 'https://api.siliconflow.cn/v1',
     }),
   ],
-  model: 'THUDM/GLM-4.1V-9B-Thinking',
 });

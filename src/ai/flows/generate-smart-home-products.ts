@@ -47,6 +47,7 @@ export async function generateSmartHomeProducts(input: GenerateSmartHomeProducts
 
 const prompt = ai.definePrompt({
   name: 'generateSmartHomeProductsPrompt',
+  model: 'THUDM/GLM-4.1V-9B-Thinking',
   input: {schema: GenerateSmartHomeProductsInputSchema},
   output: {schema: GenerateSmartHomeProductsOutputSchema},
   prompt: `你是一位AI智能家居顾问。请分析用户的房产信息、预算和需求，推荐一份智能家居产品清单。请使用中文进行回复。

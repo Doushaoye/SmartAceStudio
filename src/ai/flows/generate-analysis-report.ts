@@ -40,6 +40,7 @@ export async function generateAnalysisReport(input: GenerateAnalysisReportInput)
 
 const prompt = ai.definePrompt({
   name: 'generateAnalysisReportPrompt',
+  model: 'THUDM/GLM-4.1V-9B-Thinking',
   input: {schema: GenerateAnalysisReportInputSchema},
   output: {schema: GenerateAnalysisReportOutputSchema},
   prompt: `You are a smart home consultant who provides an analysis report based on the user's smart home plan.
