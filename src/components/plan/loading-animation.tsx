@@ -1,64 +1,51 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Progress } from '@/components/ui/progress';
 import { useI18n } from '@/context/i18n-context';
-
-const loadingSteps = [
-    { key: 'loading.steps.analyzingNeeds', duration: 3000 },
-    { key: 'loading.steps.evaluatingLayout', duration: 4000 },
-    { key: 'loading.steps.selectingProducts', duration: 5000 },
-    { key: 'loading.steps.optimizingBudget', duration: 4000 },
-    { key: 'loading.steps.generatingReport', duration: 3000 },
-    { key: 'loading.steps.finalizing', duration: 2000 },
-];
-
+import loadingTexts from '@/data/loading-texts.json';
+import { cn } from '@/lib/utils';
 
 export function LoadingAnimation() {
   const { t } = useI18n();
-  const [currentStep, setCurrentStep] = useState(0);
-  const [progress, setProgress] = useState(0);
+  const [currentTextIndex, setCurrentTextIndex] = useState(0);
 
   useEffect(() => {
-    const totalDuration = loadingSteps.reduce((acc, step) => acc + step.duration, 0);
-    let elapsed = 0;
+    // Randomly select an initial text
+    setCurrentTextIndex(Math.floor(Math.random() * loadingTexts.length));
 
-    const stepInterval = setInterval(() => {
-        if (currentStep < loadingSteps.length - 1) {
-            setCurrentStep(prev => prev + 1);
-        } else {
-            clearInterval(stepInterval);
-        }
-    }, loadingSteps[currentStep].duration);
-
-    const progressInterval = setInterval(() => {
-        elapsed += 100;
-        const currentProgress = Math.min(100, (elapsed / totalDuration) * 100);
-        setProgress(currentProgress);
-
-        if (currentProgress >= 100) {
-            clearInterval(progressInterval);
-        }
-    }, 100);
+    const textInterval = setInterval(() => {
+      setCurrentTextIndex(prevIndex => (prevIndex + 1) % loadingTexts.length);
+    }, 3000); // Change text every 3 seconds
 
     return () => {
-        clearInterval(stepInterval);
-        clearInterval(progressInterval);
+      clearInterval(textInterval);
     };
-  }, [currentStep]);
+  }, []);
 
   return (
-    <div className="flex flex-col items-center justify-center text-center py-20 gap-6 w-full max-w-2xl mx-auto">
+    <div className="flex flex-col items-center justify-center text-center py-20 gap-10 w-full max-w-2xl mx-auto">
       <h2 className="text-3xl font-semibold font-headline">{t('planningForm.loadingTitle')}</h2>
-      <div className="w-full space-y-3">
-        <Progress value={progress} />
-        <p className="text-muted-foreground text-lg animate-pulse">
-            {t(loadingSteps[currentStep].key)}
+      
+      {/* Voice Assistant Style Animation */}
+      <div className="relative w-48 h-48 flex items-center justify-center">
+        {[...Array(5)].map((_, i) => (
+          <div
+            key={i}
+            className={cn(
+              "absolute rounded-full bg-primary/50 animate-pulse-blob",
+            )}
+            style={{
+              animationDelay: `${i * 0.4}s`,
+            }}
+          />
+        ))}
+      </div>
+
+      <div className="w-full space-y-3 min-h-[100px]">
+        <p className="text-muted-foreground text-lg">
+            {loadingTexts[currentTextIndex]}
         </p>
       </div>
-      <p className="text-muted-foreground max-w-md mt-4">
-        {t('planningForm.loadingDescription')}
-      </p>
     </div>
   );
 }

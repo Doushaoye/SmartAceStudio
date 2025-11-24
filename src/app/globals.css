@@ -95,4 +95,26 @@ body {
     .animate-scroll {
         animation: scroll 40s linear infinite;
     }
+    
+    @keyframes pulse-blob {
+      0%, 100% {
+        transform: scale(0.8);
+        opacity: 0.5;
+      }
+      50% {
+        transform: scale(1.2);
+        opacity: 1;
+      }
+    }
+    .animate-pulse-blob {
+        width: 40px;
+        height: 40px;
+        animation: pulse-blob 4s infinite ease-in-out;
+    }
+
+    .animate-pulse-blob:nth-child(1) { width: 60px; height: 60px; }
+    .animate-pulse-blob:nth-child(2) { transform-origin: top left; }
+    .animate-pulse-blob:nth-child(3) { transform-origin: top right; }
+    .animate-pulse-blob:nth-child(4) { transform-origin: bottom left; }
+    .animate-pulse-blob:nth-child(5) { transform-origin: bottom right; }
 }
