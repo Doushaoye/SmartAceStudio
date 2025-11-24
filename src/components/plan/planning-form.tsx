@@ -26,6 +26,8 @@ const householdProfileOptions = [
   { label: "萌宠当家", value: "pets", icon: Cat },
 ];
 
+const mutuallyExclusiveProfiles = ["single", "couple", "kids"];
+
 const focusAreaOptions = [
   { label: "全屋安防", value: "security" },
   { label: "影音娱乐", value: "entertainment" },
@@ -209,9 +211,28 @@ export function PlanningForm() {
                             type="button"
                             variant={field.value?.includes(option.value) ? 'default' : 'outline'}
                             onClick={() => {
-                              const newValue = field.value?.includes(option.value)
-                                ? field.value.filter((v) => v !== option.value)
-                                : [...(field.value || []), option.value];
+                              const isExclusive = mutuallyExclusiveProfiles.includes(option.value);
+                              const currentValue = field.value || [];
+                              let newValue = [...currentValue];
+
+                              if (isExclusive) {
+                                // If the clicked button is already selected, unselect it.
+                                if (newValue.includes(option.value)) {
+                                  newValue = newValue.filter((v) => v !== option.value);
+                                } else {
+                                  // Unselect all other exclusive options
+                                  newValue = newValue.filter((v) => !mutuallyExclusiveProfiles.includes(v));
+                                  // Select the clicked one
+                                  newValue.push(option.value);
+                                }
+                              } else {
+                                // For non-exclusive options, just toggle
+                                if (newValue.includes(option.value)) {
+                                  newValue = newValue.filter((v) => v !== option.value);
+                                } else {
+                                  newValue.push(option.value);
+                                }
+                              }
                               field.onChange(newValue);
                             }}
                           >
