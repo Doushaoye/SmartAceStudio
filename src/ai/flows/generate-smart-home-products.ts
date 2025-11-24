@@ -39,7 +39,7 @@ const GenerateSmartHomeProductsOutputSchema = z.object({
       product_id: z.string().describe('The ID of the selected product.'),
       quantity: z.number().describe('The quantity of the product needed.'),
       room: z.string().describe('The room where the product will be used.'),
-      reason: z-string().describe('The reason for selecting this product.'),
+      reason: z.string().describe('The reason for selecting this product.'),
     })
   ).describe('The list of selected smart home products.'),
   analysisReport: z.string().describe('The analysis report in markdown format.'),
