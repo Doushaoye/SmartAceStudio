@@ -69,7 +69,7 @@ export async function generateAnalysisReport(input: GenerateAnalysisReportInput)
   `;
 
   const response = await openai.chat.completions.create({
-    model: 'THUDM/GLM-4.1V-9B-Thinking',
+    model: 'Qwen/Qwen3-VL-8B-Instruct',
     messages: [{ role: 'user', content: prompt }],
     response_format: { type: 'json_object' },
     temperature: 0.5,

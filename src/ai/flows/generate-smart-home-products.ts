@@ -100,7 +100,7 @@ JSON 对象结构示例:
   }
 
   const response = await openai.chat.completions.create({
-    model: 'THUDM/GLM-4.1V-9B-Thinking',
+    model: 'Qwen/Qwen3-VL-8B-Instruct',
     messages: messages,
     temperature: 0.5,
   });
