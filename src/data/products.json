@@ -1,0 +1,205 @@
+[
+    {
+      "id": "1001",
+      "name": "Aqara Gateway M1S",
+      "brand": "Aqara",
+      "category": "Gateway",
+      "price": 249,
+      "budget_level": "economy",
+      "description": "Zigbee 3.0 gateway with night light.",
+      "image_id": "1001"
+    },
+    {
+      "id": "1002",
+      "name": "Aqara Gateway M2",
+      "brand": "Aqara",
+      "category": "Gateway",
+      "price": 450,
+      "budget_level": "premium",
+      "description": "Multi-protocol gateway with IR remote control.",
+      "image_id": "1002"
+    },
+    {
+      "id": "2001",
+      "name": "Aqara Wall Switch D1 (1-Gang)",
+      "brand": "Aqara",
+      "category": "Switch",
+      "price": 89,
+      "budget_level": "economy",
+      "description": "Smart wall switch, no neutral wire required.",
+      "image_id": "2001"
+    },
+    {
+      "id": "2002",
+      "name": "Aqara Wall Switch D1 (2-Gang)",
+      "brand": "Aqara",
+      "category": "Switch",
+      "price": 99,
+      "budget_level": "economy",
+      "description": "Smart wall switch, no neutral wire required.",
+      "image_id": "2002"
+    },
+    {
+      "id": "2003",
+      "name": "Lutron Caseta Smart Switch",
+      "brand": "Lutron",
+      "category": "Switch",
+      "price": 250,
+      "budget_level": "premium",
+      "description": "High-end smart switch with dimming capabilities.",
+      "image_id": "2003"
+    },
+    {
+      "id": "3001",
+      "name": "Aqara Smart Plug",
+      "brand": "Aqara",
+      "category": "Socket",
+      "price": 79,
+      "budget_level": "economy",
+      "description": "Remotely control your appliances.",
+      "image_id": "3001"
+    },
+    {
+      "id": "3002",
+      "name": "TP-Link Kasa Smart Wi-Fi Plug",
+      "brand": "TP-Link",
+      "category": "Socket",
+      "price": 60,
+      "budget_level": "economy",
+      "description": "Affordable and reliable smart plug.",
+      "image_id": "3002"
+    },
+    {
+      "id": "4001",
+      "name": "Philips Hue White and Color Ambiance",
+      "brand": "Philips",
+      "category": "Light",
+      "price": 199,
+      "budget_level": "premium",
+      "description": "Smart LED bulb with 16 million colors.",
+      "image_id": "4001"
+    },
+    {
+      "id": "4002",
+      "name": "Yeelight Smart LED Bulb W3",
+      "brand": "Yeelight",
+      "category": "Light",
+      "price": 75,
+      "budget_level": "economy",
+      "description": "Dimmable and color temperature adjustable smart bulb.",
+      "image_id": "4002"
+    },
+    {
+      "id": "4003",
+      "name": "Nanoleaf Lines",
+      "brand": "Nanoleaf",
+      "category": "Light",
+      "price": 800,
+      "budget_level": "luxury",
+      "description": "Modular backlit smart light bars.",
+      "image_id": "4003"
+    },
+    {
+      "id": "5001",
+      "name": "Aqara Motion Sensor P1",
+      "brand": "Aqara",
+      "category": "Motion Sensor",
+      "price": 99,
+      "budget_level": "economy",
+      "description": "Detects motion to trigger scenes and automations.",
+      "image_id": "5001"
+    },
+    {
+      "id": "5002",
+      "name": "Philips Hue Motion Sensor",
+      "brand": "Philips",
+      "category": "Motion Sensor",
+      "price": 180,
+      "budget_level": "premium",
+      "description": "Wireless, battery-powered motion sensor for the Hue system.",
+      "image_id": "5002"
+    },
+    {
+      "id": "6001",
+      "name": "Aqara Door and Window Sensor T1",
+      "brand": "Aqara",
+      "category": "Door Sensor",
+      "price": 79,
+      "budget_level": "economy",
+      "description": "Detects if a window or door is open in real time.",
+      "image_id": "6001"
+    },
+    {
+      "id": "6002",
+      "name": "Ring Alarm Contact Sensor",
+      "brand": "Ring",
+      "category": "Door Sensor",
+      "price": 100,
+      "budget_level": "premium",
+      "description": "Part of the Ring security ecosystem.",
+      "image_id": "6002"
+    },
+    {
+      "id": "7001",
+      "name": "Aqara Curtain Driver E1",
+      "brand": "Aqara",
+      "category": "Curtain Motor",
+      "price": 450,
+      "budget_level": "economy",
+      "description": "Automate your existing curtains.",
+      "image_id": "7001"
+    },
+    {
+      "id": "7002",
+      "name": "Somfy Glydea ULTRA 60e",
+      "brand": "Somfy",
+      "category": "Curtain Motor",
+      "price": 2500,
+      "budget_level": "luxury",
+      "description": "High-end, ultra-quiet curtain motor for large curtains.",
+      "image_id": "7002"
+    },
+    {
+      "id": "8001",
+      "name": "Aqara Smart Door Lock N100",
+      "brand": "Aqara",
+      "category": "Smart Lock",
+      "price": 1200,
+      "budget_level": "premium",
+      "description": "Multiple unlocking methods including fingerprint and NFC.",
+      "image_id": "8001"
+    },
+    {
+      "id": "8002",
+      "name": "Eufy Security Smart Lock Touch & Wi-Fi",
+      "brand": "Eufy",
+      "category": "Smart Lock",
+      "price": 900,
+      "budget_level": "premium",
+      "description": "Fingerprint scanner and Wi-Fi connectivity.",
+      "image_id": "8002"
+    },
+    {
+      "id": "8003",
+      "name": "August Wi-Fi Smart Lock",
+      "brand": "August",
+      "category": "Smart Lock",
+      "price": 1100,
+      "budget_level": "premium",
+      "description": "Retrofit smart lock that attaches to your existing deadbolt.",
+      "image_id": "8003"
+    },
+    {"id": "9001", "name": "Google Nest Hub Max", "brand": "Google", "category": "Gateway", "price": 1500, "budget_level": "luxury", "description": "Smart display with a camera and powerful speaker.", "image_id": "9001"},
+    {"id": "9002", "name": "Amazon Echo Show 10", "brand": "Amazon", "category": "Gateway", "price": 1600, "budget_level": "luxury", "description": "Smart display that moves with you.", "image_id": "9002"},
+    {"id": "2004", "name": "Brilliant Smart Home Control (2-Switch Panel)", "brand": "Brilliant", "category": "Switch", "price": 2200, "budget_level": "luxury", "description": "All-in-one smart home control panel that replaces a standard light switch.", "image_id": "2004"},
+    {"id": "4004", "name": "IKEA TRÅDFRI LED bulb E26", "brand": "IKEA", "category": "Light", "price": 50, "budget_level": "economy", "description": "Affordable smart bulb with basic dimming.", "image_id": "4004"},
+    {"id": "4005", "name": "LIFX Color A19", "brand": "LIFX", "category": "Light", "price": 220, "budget_level": "premium", "description": "Vibrant colors and no hub required.", "image_id": "4005"},
+    {"id": "5003", "name": "Aeotec MultiSensor 6", "brand": "Aeotec", "category": "Motion Sensor", "price": 250, "budget_level": "luxury", "description": "6-in-1 Z-Wave sensor: motion, temperature, humidity, light, UV, vibration.", "image_id": "5003"},
+    {"id": "7003", "name": "SwitchBot Curtain", "brand": "SwitchBot", "category": "Curtain Motor", "price": 380, "budget_level": "economy", "description": "Easy to install retrofit curtain robot.", "image_id": "7003"},
+    {"id": "8004", "name": "Wyze Lock", "brand": "Wyze", "category": "Smart Lock", "price": 550, "budget_level": "economy", "description": "Affordable smart lock that works with your existing deadbolt.", "image_id": "8004"},
+    {"id": "1003", "name": "Hubitat Elevation Model C-7", "brand": "Hubitat", "category": "Gateway", "price": 700, "budget_level": "premium", "description": "Local processing for speed and reliability.", "image_id": "1003"},
+    {"id": "4006", "name": "Dyson Lightcycle Morph", "brand": "Dyson", "category": "Light", "price": 4500, "budget_level": "luxury", "description": "Intelligent task light that tracks local daylight.", "image_id": "4006"},
+    {"id": "2005", "name": "Sonoff TX Ultimate (2-Gang)", "brand": "Sonoff", "category": "Switch", "price": 150, "budget_level": "economy", "description": "Smart wall switch with haptic feedback and ambient light.", "image_id": "2005"},
+    {"id": "3003", "name": "Eve Energy Smart Plug", "brand": "Eve", "category": "Socket", "price": 180, "budget_level": "premium", "description": "Thread-enabled smart plug with energy monitoring.", "image_id": "3003"}
+  ]
+  
