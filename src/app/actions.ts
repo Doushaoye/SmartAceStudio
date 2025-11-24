@@ -8,14 +8,21 @@ export async function generateProposalAction(
   formData: FormData
 ): Promise<{ proposal?: Proposal; error?: string }> {
   try {
-    const simplifiedProducts = products.map(({ id, name, category, price, budget_level }) => ({
-      id,
-      name,
-      category,
-      price,
-      budget_level
-    }));
-    const productsJson = JSON.stringify(simplifiedProducts);
+    // If user provides a custom product list, use it. Otherwise, use the default.
+    let productsJson = formData.get('productsJson') as string;
+    if (!productsJson) {
+      const simplifiedProducts = products.map(({ id, name, category, price, budget_level, brand, description }) => ({
+        id,
+        name,
+        brand,
+        category,
+        price,
+        budget_level,
+        description
+      }));
+      productsJson = JSON.stringify(simplifiedProducts);
+    }
+
 
     const area = Number(formData.get('area'));
     const layout = formData.get('layout') as '2r1l1b' | '3r2l1b' | '3r2l2b' | '4r2l2b' | '4r2l3b';
@@ -48,13 +55,15 @@ export async function generateProposalAction(
       throw new Error('AI failed to generate a valid proposal.');
     }
     
-    const productMap = new Map<string, Product>(products.map((p) => [p.id, p]));
+    // The product map should be a combination of default and custom products
+    const allProducts = [...products, ...(productsJson ? JSON.parse(productsJson) : [])];
+    const productMap = new Map<string, Product>(allProducts.map((p) => [p.id, p]));
 
     const enrichedItems = aiResult.selectedItems.map(item => {
       const product = productMap.get(item.product_id);
       if (!product) {
         // AI might hallucinate a product, we'll just skip it
-        console.warn(`Product with ID ${item.product_id} not found.`);
+        console.warn(`Product with ID ${item.product_id} not found in available products.`);
         return null;
       }
       return {

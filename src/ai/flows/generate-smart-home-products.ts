@@ -33,7 +33,7 @@ const GenerateSmartHomeProductsInputSchema = z.object({
       "A photo of the floor plan, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
     ),
   customNeeds: z.string().describe('Any custom needs or preferences specified by the user.'),
-  productsJson: z.string().describe('The full JSON content of the products database.'),
+  productsJson: z.string().describe('The JSON content of the available products database. This could be user-provided or the system default.'),
 });
 export type GenerateSmartHomeProductsInput = z.infer<typeof GenerateSmartHomeProductsInputSchema>;
 
@@ -102,10 +102,10 @@ ${input.customNeeds || "无"}
 
 ${input.floorPlanDataUri ? `平面图: [Image Attached]` : ''}
 
-可选产品列表:
+产品库 (你必须从此列表里选择产品):
 ${input.productsJson}
 
-请根据以上所有信息，特别是用户的画像、核心需求和手写需求，选择适合用户的智能家居产品。在选择时，请综合考虑用户的预算和需求。"room" 和 "reason" 字段必须使用中文。
+请根据以上所有信息，特别是用户的画像、核心需求和手写需求，从提供的产品库中选择适合用户的智能家居产品。在选择时，请综合考虑用户的预算和需求。"room" 和 "reason" 字段必须使用中文。
 
 重要：你必须返回一个有效的 JSON 对象。
 该对象可以包含 "selectedItems" 和 "analysisReport" 两个键，或者仅包含 "selectedItems" 键。
@@ -163,7 +163,8 @@ JSON 对象结构示例:
     if (!parsedJson.analysisReport) {
         console.log("AI did not return an analysis report. Generating one separately.");
         
-        const productMap = new Map(products.map((p) => [p.id, p]));
+        const productMap = new Map(JSON.parse(input.productsJson).map((p: any) => [p.id, p]));
+
         const totalCost = parsedJson.selectedItems.reduce((acc: number, item: { product_id: string, quantity: number }) => {
             const product = productMap.get(item.product_id);
             return acc + (product ? product.price * item.quantity : 0);

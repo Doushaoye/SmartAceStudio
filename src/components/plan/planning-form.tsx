@@ -12,11 +12,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { useProposal } from '@/context/proposal-context';
-import { DollarSign, Zap, Gem, ArrowRight, FileUp, User, Heart, Baby, Accessibility, Cat } from 'lucide-react';
+import { DollarSign, Zap, Gem, ArrowRight, FileUp, User, Heart, Baby, Accessibility, Cat, Download, Upload, FileJson } from 'lucide-react';
 import { useI18n } from '@/context/i18n-context';
 import { LoadingAnimation } from './loading-animation';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
+import { useToast } from '@/hooks/use-toast';
 
 const householdProfileOptions = [
   { label: "独居青年", value: "single", icon: User },
@@ -36,6 +37,18 @@ const focusAreaOptions = [
   { label: "节能环保", value: "energy" },
 ];
 
+const CustomProductSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  brand: z.string(),
+  category: z.string(),
+  price: z.number(),
+  budget_level: z.enum(['economy', 'premium', 'luxury']),
+  description: z.string(),
+});
+
+const CustomProductsStoreSchema = z.array(CustomProductSchema);
+
 
 const formSchema = z.object({
   area: z.coerce.number().min(1, 'Area must be at least 1 sq ft.'),
@@ -45,11 +58,35 @@ const formSchema = z.object({
   focusAreas: z.array(z.string()).optional(),
   customNeeds: z.string().optional(),
   floorPlan: z.instanceof(File).optional(),
+  customProductsJson: z.string().optional(),
 });
+
+const templateJson = [
+    {
+        "id": "USER-001",
+        "name": "自定义产品A",
+        "brand": "自定义品牌",
+        "category": "网关",
+        "price": 199,
+        "budget_level": "economy",
+        "description": "这是一个用户自定义的产品示例，用于家庭的中央控制。"
+    },
+    {
+        "id": "USER-002",
+        "name": "自定义灯泡B",
+        "brand": "飞利浦",
+        "category": "灯光",
+        "price": 88,
+        "budget_level": "premium",
+        "description": "高品质彩色智能灯泡。"
+    }
+];
 
 export function PlanningForm() {
   const { isLoading, generateProposal } = useProposal();
-  const { t, language } = useI18n();
+  const { t } = useI18n();
+  const { toast } = useToast();
+  const [customProductsFile, setCustomProductsFile] = useState<File | null>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -59,8 +96,53 @@ export function PlanningForm() {
       householdProfile: [],
       focusAreas: [],
       customNeeds: '',
+      customProductsJson: '',
     },
   });
+
+  const handleDownloadTemplate = () => {
+    const jsonString = JSON.stringify(templateJson, null, 2);
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'custom-products-template.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const content = e.target?.result as string;
+          const parsed = JSON.parse(content);
+          CustomProductsStoreSchema.parse(parsed); // Validate schema
+          form.setValue('customProductsJson', content);
+          setCustomProductsFile(file);
+          toast({
+            title: "上传成功",
+            description: `产品库文件 "${file.name}" 已成功上传并验证。`,
+          });
+        } catch (error) {
+          console.error("JSON validation error:", error);
+          form.setValue('customProductsJson', '');
+          setCustomProductsFile(null);
+          event.target.value = ''; // Reset file input
+          toast({
+            variant: "destructive",
+            title: "文件格式错误",
+            description: "上传的JSON文件格式不符合要求，请检查后重试。",
+          });
+        }
+      };
+      reader.readAsText(file);
+    }
+  };
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     const formData = new FormData();
@@ -79,6 +161,11 @@ export function PlanningForm() {
     if (values.floorPlan) {
       formData.append('floorPlan', values.floorPlan);
     }
+    
+    if (values.customProductsJson) {
+      formData.append('productsJson', values.customProductsJson);
+    }
+
     generateProposal(formData);
   };
   
@@ -216,17 +303,13 @@ export function PlanningForm() {
                               let newValue = [...currentValue];
 
                               if (isExclusive) {
-                                // If the clicked button is already selected, unselect it.
                                 if (newValue.includes(option.value)) {
                                   newValue = newValue.filter((v) => v !== option.value);
                                 } else {
-                                  // Unselect all other exclusive options
                                   newValue = newValue.filter((v) => !mutuallyExclusiveProfiles.includes(v));
-                                  // Select the clicked one
                                   newValue.push(option.value);
                                 }
                               } else {
-                                // For non-exclusive options, just toggle
                                 if (newValue.includes(option.value)) {
                                   newValue = newValue.filter((v) => v !== option.value);
                                 } else {
@@ -273,46 +356,77 @@ export function PlanningForm() {
                     </FormItem>
                   )}
                 />
+            </div>
+            
+            <div className="space-y-6">
+                <h3 className="font-semibold text-lg font-headline">自定义产品库 (可选)</h3>
+                 <div className="p-4 border rounded-lg space-y-4 bg-muted/20">
+                    <FormDescription>
+                        您可以上传自己的产品库JSON文件，AI将优先使用您提供的产品进行方案设计。
+                    </FormDescription>
+                    <div className="flex flex-col sm:flex-row gap-4">
+                        <Button type="button" variant="outline" onClick={handleDownloadTemplate} className="w-full sm:w-auto">
+                            <Download className="mr-2 h-4 w-4" />
+                            下载模板
+                        </Button>
+                        <div className="relative w-full sm:w-auto">
+                            <Button type="button" variant="outline" asChild className="w-full">
+                                <Label htmlFor="custom-products-upload" className="cursor-pointer">
+                                    <Upload className="mr-2 h-4 w-4" />
+                                    上传产品库
+                                </Label>
+                            </Button>
+                            <Input id="custom-products-upload" type="file" accept=".json" className="sr-only" onChange={handleFileUpload} />
+                        </div>
+                    </div>
+                    {customProductsFile && (
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground p-2 bg-background rounded-md border">
+                            <FileJson className="h-5 w-5 text-primary" />
+                            <span>已上传: <span className="font-medium text-foreground">{customProductsFile.name}</span></span>
+                        </div>
+                    )}
+                 </div>
+            </div>
 
-                <div className="grid md:grid-cols-2 gap-6 pt-4">
-                    <FormField
-                      control={form.control}
-                      name="floorPlan"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t('planningForm.customization.floorPlanLabel')}</FormLabel>
-                          <FormControl>
-                            <div className="relative">
-                                <FileUp className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                                <Input type="file" accept="image/*" className="pl-9" 
-                                   onChange={(e) => field.onChange(e.target.files ? e.target.files[0] : undefined)}
-                                />
-                            </div>
-                          </FormControl>
-                          <FormDescription>{t('planningForm.customization.floorPlanDescription')}</FormDescription>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                     <FormField
-                      control={form.control}
-                      name="customNeeds"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t('planningForm.customization.customNeedsLabel')}</FormLabel>
-                          <FormControl>
-                            <Textarea
-                              placeholder="还有其他特殊需求吗？例如：'希望主卧有一个阅读模式'..."
-                              className="resize-none"
-                              {...field}
-                              rows={4}
+
+            <div className="grid md:grid-cols-2 gap-6">
+                <FormField
+                  control={form.control}
+                  name="floorPlan"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('planningForm.customization.floorPlanLabel')}</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                            <FileUp className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                            <Input type="file" accept="image/*" className="pl-9" 
+                               onChange={(e) => field.onChange(e.target.files ? e.target.files[0] : undefined)}
                             />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                </div>
+                        </div>
+                      </FormControl>
+                      <FormDescription>{t('planningForm.customization.floorPlanDescription')}</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                 <FormField
+                  control={form.control}
+                  name="customNeeds"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('planningForm.customization.customNeedsLabel')}</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="还有其他特殊需求吗？例如：'希望主卧有一个阅读模式'..."
+                          className="resize-none"
+                          {...field}
+                          rows={4}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
             </div>
 
             <div className="flex justify-end pt-4">
