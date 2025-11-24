@@ -8,7 +8,7 @@ export function Header() {
       <div className="container flex h-16 items-center">
         <Link href="/" className="flex items-center gap-3">
           <Logo />
-          <span className="font-bold font-headline hidden sm:inline-block">SmartHome AI Planner</span>
+          <span className="font-bold font-headline hidden sm:inline-block">智装，就找智装侠</span>
         </Link>
         <div className="ml-auto">
           <LanguageSwitcher />

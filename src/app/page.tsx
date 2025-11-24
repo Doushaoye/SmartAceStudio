@@ -22,7 +22,7 @@ export default function Home() {
     <>
       <div className="container flex flex-col items-center justify-center text-center pt-24 md:pt-32">
         <h1 className="text-4xl md:text-6xl font-bold font-headline tracking-tight max-w-4xl">
-          {t('home.title')}
+          智装侠 SmartAceStudio
         </h1>
         <p className="mt-4 text-lg md:text-xl text-muted-foreground max-w-2xl">
           {t('home.subtitle')}

@@ -56,10 +56,11 @@ export async function generateAnalysisReport(input: GenerateAnalysisReportInput)
   Here are the selected items:
   ${selectedItemsString}
 
-  Your analysis report should explain the following:
-  1.  What features were compromised due to budget?
-  2.  Suggestions for upgrades if the budget allows.
-  3.  Ways to save money.
+  Your analysis report should explain the following in markdown format:
+  1. What automation functions does this plan achieve compared to a non-smart home? (e.g., automated lighting, scheduled curtains, etc.)
+  2. What features were compromised due to budget?
+  3. Suggestions for upgrades if the budget allows.
+  4. Ways to save money.
 
   Return the analysis report as a markdown string.
   Make sure to mention specific products or categories of products in the report.
