@@ -25,7 +25,6 @@ const GenerateSmartHomeProductsInputSchema = z.object({
     ),
   customNeeds: z.string().describe('Any custom needs or preferences specified by the user.'),
   productsJson: z.string().describe('The full JSON content of the products database.'),
-  language: z.enum(['en', 'zh', 'ja', 'ko']).describe('The language for the response.'),
 });
 export type GenerateSmartHomeProductsInput = z.infer<typeof GenerateSmartHomeProductsInputSchema>;
 
@@ -50,38 +49,36 @@ const prompt = ai.definePrompt({
   name: 'generateSmartHomeProductsPrompt',
   input: {schema: GenerateSmartHomeProductsInputSchema},
   output: {schema: GenerateSmartHomeProductsOutputSchema},
-  prompt: `You are an AI smart home consultant. Analyze the user's property details, budget, and needs to recommend a list of smart home products.
+  prompt: `你是一位AI智能家居顾问。请分析用户的房产信息、预算和需求，推荐一份智能家居产品清单。请使用中文进行回复。
 
-Generate the response in the following language: {{{language}}}
-
-Property Details:
-Area: {{{area}}} sq ft
-Layout: {{{layout}}}
-Budget Level: {{{budgetLevel}}}
-Custom Needs: {{{customNeeds}}}
+房产信息:
+面积: {{{area}}} 平方米
+户型: {{{layout}}}
+预算等级: {{{budgetLevel}}}
+定制需求: {{{customNeeds}}}
 {{#if floorPlanDataUri}}
-Floor Plan: {{media url=floorPlanDataUri}}
+平面图: {{media url=floorPlanDataUri}}
 {{/if}}
 
-Available Products:
+可选产品列表:
 {{{productsJson}}}
 
-Based on the above information, select a list of smart home products that are suitable for the user. Consider their budget and needs when making your selections. The "room" and "reason" fields in the output must be in the requested language.
+请根据以上信息，选择适合用户的智能家居产品。在选择时，请综合考虑用户的预算和需求。"room" 和 "reason" 字段必须使用中文。
 
-Return a JSON object with the following structure:
+请返回一个包含以下结构的JSON对象:
 {
   "selected_items": [
-    { "product_id": "1001", "quantity": 1, "room": "Living Room", "reason": "Central control hub" }
+    { "product_id": "1001", "quantity": 1, "room": "客厅", "reason": "中央控制中心" }
   ],
-  "analysis_report": "Markdown string here..."
+  "analysis_report": "Markdown格式的分析报告..."
 }
 
-The analysis_report must be in the requested language ({{{language}}}) and must explain:
-1. What features were compromised due to budget?
-2. Suggestions for upgrades if budget allows.
-3. Ways to save money.
+analysis_report必须是中文的Markdown格式，并解释：
+1.  由于预算限制，哪些功能打了折扣？
+2.  如果预算允许，有哪些升级建议？
+3.  有哪些省钱的方法？
 
-Ensure the JSON is valid and contains no markdown wrapping.`, 
+确保返回的JSON是有效的，并且不包含任何Markdown包装。`, 
 });
 
 const generateSmartHomeProductsFlow = ai.defineFlow(

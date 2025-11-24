@@ -42,7 +42,6 @@ export function PlanningForm() {
     formData.append('layout', values.layout);
     formData.append('budgetLevel', values.budgetLevel);
     formData.append('customNeeds', values.customNeeds || '');
-    formData.append('language', language);
     if (values.floorPlan) {
       formData.append('floorPlan', values.floorPlan);
     }
@@ -101,8 +100,8 @@ export function PlanningForm() {
                           <SelectItem value="2r1l1b">{t('planningForm.propertyInfo.layoutOptions.2r1l1b')}</SelectItem>
                           <SelectItem value="3r2l1b">{t('planningForm.propertyInfo.layoutOptions.3r2l1b')}</SelectItem>
                           <SelectItem value="3r2l2b">{t('planningForm.propertyInfo.layoutOptions.3r2l2b')}</SelectItem>
-                          <SelectItem value="4r2l2b">{t('planningForm.propertyInfo.layoutOptions.4r2l2b')}</SelectItem>
-                          <SelectItem value="4r2l3b">{t('planningForm.propertyInfo.layoutOptions.4r2l3b')}</SelectItem>
+                          <SelectItem value="4r2l2b">{t['planningForm.propertyInfo.layoutOptions.4r2l2b']}</SelectItem>
+                          <SelectItem value="4r2l3b">{t['planningForm.propertyInfo.layoutOptions.4r2l3b']}</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
