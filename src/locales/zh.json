@@ -15,11 +15,11 @@
             "layoutLabel": "户型",
             "layoutPlaceholder": "请选择房产户型",
             "layoutOptions": {
-                "studio": "单间",
-                "1b1b": "一室一卫",
-                "2b1b": "两室一卫",
-                "3b2b": "三室两卫",
-                "villa": "别墅"
+                "2r1l1b": "两室一厅一卫",
+                "3r2l1b": "三室两厅一卫",
+                "3r2l2b": "三室两厅两卫",
+                "4r2l2b": "四室两厅两卫",
+                "4r2l3b": "四室两厅三卫"
             }
         },
         "budget": {

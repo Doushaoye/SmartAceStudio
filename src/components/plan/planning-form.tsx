@@ -20,7 +20,7 @@ const formSchema = z.object({
   layout: z.string().min(1, 'Please select a layout.'),
   budgetLevel: z.enum(['economy', 'premium', 'luxury'], { required_error: 'Please select a budget tier.' }),
   customNeeds: z.string().optional(),
-  floorPlan: z.instanceof(File).optional(),
+  floorPlan: z.instanceof(File).optional().nullable(),
 });
 
 export function PlanningForm() {
@@ -31,7 +31,7 @@ export function PlanningForm() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       area: 500,
-      layout: '1B1B',
+      layout: '3R2L2B',
       customNeeds: '',
     },
   });
@@ -100,11 +100,11 @@ export function PlanningForm() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="Studio">{t('planningForm.propertyInfo.layoutOptions.studio')}</SelectItem>
-                          <SelectItem value="1B1B">{t('planningForm.propertyInfo.layoutOptions.1b1b')}</SelectItem>
-                          <SelectItem value="2B1B">{t('planningForm.propertyInfo.layoutOptions.2b1b')}</SelectItem>
-                          <SelectItem value="3B2B">{t('planningForm.propertyInfo.layoutOptions.3b2b')}</SelectItem>
-                          <SelectItem value="Villa">{t('planningForm.propertyInfo.layoutOptions.villa')}</SelectItem>
+                          <SelectItem value="2R1L1B">{t('planningForm.propertyInfo.layoutOptions.2r1l1b')}</SelectItem>
+                          <SelectItem value="3R2L1B">{t('planningForm.propertyInfo.layoutOptions.3r2l1b')}</SelectItem>
+                          <SelectItem value="3R2L2B">{t('planningForm.propertyInfo.layoutOptions.3r2l2b')}</SelectItem>
+                          <SelectItem value="4R2L2B">{t('planningForm.propertyInfo.layoutOptions.4r2l2b')}</SelectItem>
+                          <SelectItem value="4R2L3B">{t('planningForm.propertyInfo.layoutOptions.4r2l3b')}</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />

@@ -15,11 +15,11 @@
             "layoutLabel": "Layout",
             "layoutPlaceholder": "Select a property layout",
             "layoutOptions": {
-                "studio": "Studio",
-                "1b1b": "1 Bed 1 Bath",
-                "2b1b": "2 Bed 1 Bath",
-                "3b2b": "3 Bed 2 Bath",
-                "villa": "Villa"
+                "2r1l1b": "2 Rooms, 1 Living, 1 Bath",
+                "3r2l1b": "3 Rooms, 2 Living, 1 Bath",
+                "3r2l2b": "3 Rooms, 2 Living, 2 Baths",
+                "4r2l2b": "4 Rooms, 2 Living, 2 Baths",
+                "4r2l3b": "4 Rooms, 2 Living, 3 Baths"
             }
         },
         "budget": {

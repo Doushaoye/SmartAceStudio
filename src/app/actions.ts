@@ -11,7 +11,7 @@ export async function generateProposalAction(
     const productsJson = JSON.stringify(products);
 
     const area = Number(formData.get('area'));
-    const layout = formData.get('layout') as 'Studio' | '1B1B' | '2B1B' | '3B2B' | 'Villa';
+    const layout = formData.get('layout') as '2R1L1B' | '3R2L1B' | '3R2L2B' | '4R2L2B' | '4R2L3B';
     const budgetLevel = formData.get('budgetLevel') as 'economy' | 'premium' | 'luxury';
     const customNeeds = formData.get('customNeeds') as string;
     const floorPlanFile = formData.get('floorPlan') as File | null;
