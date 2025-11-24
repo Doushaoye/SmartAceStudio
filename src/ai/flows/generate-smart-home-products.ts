@@ -39,7 +39,7 @@ const GenerateSmartHomeProductsOutputSchema = z.object({
       product_id: z.string().describe('The ID of the selected product.'),
       quantity: z.number().describe('The quantity of the product needed.'),
       room: z.string().describe('The room where the product will be used.'),
-      reason: z.string().describe('The reason for selecting this product.'),
+      reason: z-string().describe('The reason for selecting this product.'),
     })
   ).describe('The list of selected smart home products.'),
   analysisReport: z.string().describe('The analysis report in markdown format.'),
@@ -61,20 +61,21 @@ ${input.productsJson}
 
 请根据以上信息，选择适合用户的智能家居产品。在选择时，请综合考虑用户的预算和需求。"room" 和 "reason" 字段必须使用中文。
 
-请返回一个包含以下结构的JSON对象:
+重要：你必须返回一个有效的 JSON 对象，该对象仅包含 "selectedItems" 和 "analysisReport" 两个键。不要在 JSON 对象前后添加任何其他文本、解释或 markdown 格式。
+
+JSON 对象结构如下:
 {
   "selectedItems": [
     { "product_id": "1001", "quantity": 1, "room": "客厅", "reason": "中央控制中心" }
   ],
-  "analysisReport": "Markdown格式的分析报告..."
+  "analysisReport": "Markdown格式的中文分析报告..."
 }
 
 analysis_report必须是中文的Markdown格式，并解释：
 1.  由于预算限制，哪些功能打了折扣？
 2.  如果预算允许，有哪些升级建议？
 3.  有哪些省钱的方法？
-
-确保返回的JSON是有效的，并且不包含任何Markdown包装。`;
+`;
 
   const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
     {
@@ -97,7 +98,6 @@ analysis_report必须是中文的Markdown格式，并解释：
   const response = await openai.chat.completions.create({
     model: 'THUDM/GLM-4.1V-9B-Thinking',
     messages: messages,
-    response_format: { type: 'json_object' },
     temperature: 0.5,
   });
   
@@ -107,10 +107,13 @@ analysis_report必须是中文的Markdown格式，并解释：
   }
 
   try {
-    const parsedJson = JSON.parse(content);
+    // The response might be wrapped in markdown, so we need to extract the JSON part.
+    const jsonMatch = content.match(/```(json)?\n?([\s\S]*?)\n?```/);
+    const jsonString = jsonMatch ? jsonMatch[2] : content;
+    const parsedJson = JSON.parse(jsonString);
     return GenerateSmartHomeProductsOutputSchema.parse(parsedJson);
   } catch (error) {
-    console.error("Failed to parse AI response:", error);
+    console.error("Failed to parse AI response:", content, error);
     throw new Error('AI returned invalid JSON format.');
   }
 }
