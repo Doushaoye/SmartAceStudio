@@ -9,11 +9,11 @@ import { Card, CardContent } from '@/components/ui/card';
 import { ContactSection } from '@/components/contact-section';
 
 const showcaseImages = [
-  'https://picsum.photos/seed/showcase1/600/400',
-  'https://picsum.photos/seed/showcase2/600/400',
-  'https://picsum.photos/seed/showcase3/600/400',
-  'https://picsum.photos/seed/showcase4/600/400',
-  'https://picsum.photos/seed/showcase5/600/400',
+  { src: 'https://picsum.photos/seed/showcase1/600/400', hint: 'living room' },
+  { src: 'https://picsum.photos/seed/showcase2/600/400', hint: 'smart kitchen' },
+  { src: 'https://picsum.photos/seed/showcase3/600/400', hint: 'bedroom automation' },
+  { src: 'https://picsum.photos/seed/showcase4/600/400', hint: 'home office' },
+  { src: 'https://picsum.photos/seed/showcase5/600/400', hint: 'security camera' },
 ];
 
 export default function Home() {
@@ -45,17 +45,18 @@ export default function Home() {
           className="w-full"
         >
           <CarouselContent>
-            {showcaseImages.map((src, index) => (
+            {showcaseImages.map((image, index) => (
               <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3">
                 <div className="p-1">
                   <Card>
                     <CardContent className="flex aspect-video items-center justify-center p-0 overflow-hidden rounded-lg">
                        <Image
-                          src={src}
+                          src={image.src}
                           alt={`Smart home showcase ${index + 1}`}
                           width={600}
                           height={400}
                           className="object-cover w-full h-full"
+                          data-ai-hint={image.hint}
                         />
                     </CardContent>
                   </Card>
