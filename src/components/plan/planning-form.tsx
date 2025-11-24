@@ -16,11 +16,11 @@ import { DollarSign, Zap, Gem, ArrowRight, Loader2, FileUp } from 'lucide-react'
 import { useI18n } from '@/context/i18n-context';
 
 const formSchema = z.object({
-  area: z.coerce.number().min(10, 'Area must be at least 10 sq ft.'),
+  area: z.coerce.number().min(1, 'Area must be at least 1 sq ft.'),
   layout: z.string().min(1, 'Please select a layout.'),
   budgetLevel: z.enum(['economy', 'premium', 'luxury'], { required_error: 'Please select a budget tier.' }),
   customNeeds: z.string().optional(),
-  floorPlan: z.instanceof(File).optional().nullable(),
+  floorPlan: z.any().optional(),
 });
 
 export function PlanningForm() {
@@ -30,8 +30,8 @@ export function PlanningForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      area: 500,
-      layout: '3R2L2B',
+      area: 110,
+      layout: '3r2l2b',
       customNeeds: '',
     },
   });
@@ -43,8 +43,8 @@ export function PlanningForm() {
     formData.append('budgetLevel', values.budgetLevel);
     formData.append('customNeeds', values.customNeeds || '');
     formData.append('language', language);
-    if (values.floorPlan) {
-      formData.append('floorPlan', values.floorPlan);
+    if (values.floorPlan && values.floorPlan.length > 0) {
+      formData.append('floorPlan', values.floorPlan[0]);
     }
     generateProposal(formData);
   };
@@ -100,11 +100,11 @@ export function PlanningForm() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="2R1L1B">{t('planningForm.propertyInfo.layoutOptions.2r1l1b')}</SelectItem>
-                          <SelectItem value="3R2L1B">{t('planningForm.propertyInfo.layoutOptions.3r2l1b')}</SelectItem>
-                          <SelectItem value="3R2L2B">{t('planningForm.propertyInfo.layoutOptions.3r2l2b')}</SelectItem>
-                          <SelectItem value="4R2L2B">{t('planningForm.propertyInfo.layoutOptions.4r2l2b')}</SelectItem>
-                          <SelectItem value="4R2L3B">{t('planningForm.propertyInfo.layoutOptions.4r2l3b')}</SelectItem>
+                          <SelectItem value="2r1l1b">{t('planningForm.propertyInfo.layoutOptions.2r1l1b')}</SelectItem>
+                          <SelectItem value="3r2l1b">{t('planningForm.propertyInfo.layoutOptions.3r2l1b')}</SelectItem>
+                          <SelectItem value="3r2l2b">{t('planningForm.propertyInfo.layoutOptions.3r2l2b')}</SelectItem>
+                          <SelectItem value="4r2l2b">{t('planningForm.propertyInfo.layoutOptions.4r2l2b')}</SelectItem>
+                          <SelectItem value="4r2l3b">{t('planningForm.propertyInfo.layoutOptions.4r2l3b')}</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -178,13 +178,13 @@ export function PlanningForm() {
                     <FormField
                       control={form.control}
                       name="floorPlan"
-                      render={({ field: { onChange, ...field } }) => (
+                      render={() => (
                         <FormItem>
                           <FormLabel>{t('planningForm.customization.floorPlanLabel')}</FormLabel>
                           <FormControl>
                             <div className="relative">
                                 <FileUp className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                                <Input type="file" accept="image/*" className="pl-9" {...floorPlanRef} onChange={(e) => onChange(e.target.files?.[0])} />
+                                <Input type="file" accept="image/*" className="pl-9" {...floorPlanRef} />
                             </div>
                           </FormControl>
                           <FormDescription>{t('planningForm.customization.floorPlanDescription')}</FormDescription>
