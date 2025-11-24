@@ -59,10 +59,22 @@
             "subtotal": "小計"
         },
         "totalBudget": "推定総予算",
-        "aiAnalysis": "AIコンサルタント分析"
+        "aiAnalysis": "AIコンサルタント分析",
+        "unlockButton": "完全な提案のロックを解除",
+        "unlockPrompt": "ロックを解除して、この部屋のアイテムを表示します。",
+        "unlockForm": {
+            "title": "完全な提案のロックを解除",
+            "description": "完全な計画と予算を表示するには、連絡先情報を提供してください。プロジェクトについて話し合うために連絡します。",
+            "nameLabel": "名前",
+            "namePlaceholder": "あなたの名前",
+            "phoneLabel": "電話番号",
+            "phonePlaceholder": "あなたの電話番号",
+            "submitButton": "今すぐロック解除"
+        }
     },
     "errors": {
         "unknown": "不明なエラーが発生しました。",
-        "generateProposalTitle": "提案の生成中にエラーが発生しました"
+        "generateProposalTitle": "提案の生成中にエラーが発生しました",
+        "invalidPhone": "有効な11桁の中国の携帯電話番号を入力してください。"
     }
 }

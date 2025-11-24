@@ -59,10 +59,22 @@
             "subtotal": "Subtotal"
         },
         "totalBudget": "Total Estimated Budget",
-        "aiAnalysis": "AI Consultant Analysis"
+        "aiAnalysis": "AI Consultant Analysis",
+        "unlockButton": "Unlock Full Proposal",
+        "unlockPrompt": "Unlock to view items for this room.",
+        "unlockForm": {
+            "title": "Unlock Full Proposal",
+            "description": "To view the complete plan and budget, please provide your contact information. We'll be in touch to discuss your project.",
+            "nameLabel": "Name",
+            "namePlaceholder": "Your Name",
+            "phoneLabel": "Phone Number",
+            "phonePlaceholder": "Your Phone Number",
+            "submitButton": "Unlock Now"
+        }
     },
     "errors": {
         "unknown": "An unknown error occurred.",
-        "generateProposalTitle": "Error Generating Proposal"
+        "generateProposalTitle": "Error Generating Proposal",
+        "invalidPhone": "Please enter a valid 11-digit Chinese mobile number."
     }
 }

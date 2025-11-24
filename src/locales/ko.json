@@ -59,10 +59,22 @@
             "subtotal": "소계"
         },
         "totalBudget": "총 예상 예산",
-        "aiAnalysis": "AI 컨설턴트 분석"
+        "aiAnalysis": "AI 컨설턴트 분석",
+        "unlockButton": "전체 제안 잠금 해제",
+        "unlockPrompt": "이 방의 항목을 보려면 잠금을 해제하십시오.",
+        "unlockForm": {
+            "title": "전체 제안 잠금 해제",
+            "description": "전체 계획 및 예산을 보려면 연락처 정보를 제공하십시오. 프로젝트에 대해 논의하기 위해 연락 드리겠습니다.",
+            "nameLabel": "이름",
+            "namePlaceholder": "당신의 이름",
+            "phoneLabel": "전화 번호",
+            "phonePlaceholder": "전화 번호",
+            "submitButton": "지금 잠금 해제"
+        }
     },
     "errors": {
         "unknown": "알 수 없는 오류가 발생했습니다.",
-        "generateProposalTitle": "제안 생성 중 오류 발생"
+        "generateProposalTitle": "제안 생성 중 오류 발생",
+        "invalidPhone": "유효한 11자리 중국 휴대폰 번호를 입력하세요."
     }
 }

@@ -59,10 +59,22 @@
             "subtotal": "小计"
         },
         "totalBudget": "预计总预算",
-        "aiAnalysis": "AI 顾问分析"
+        "aiAnalysis": "AI 顾问分析",
+        "unlockButton": "解锁查看完整方案",
+        "unlockPrompt": "解锁后查看此区域设备清单。",
+        "unlockForm": {
+            "title": "解锁完整方案",
+            "description": "为了查看完整的方案和预算，请留下您的联系方式，我们将与您取得联系。",
+            "nameLabel": "姓名",
+            "namePlaceholder": "请输入您的姓名",
+            "phoneLabel": "手机号码",
+            "phonePlaceholder": "请输入您的手机号",
+            "submitButton": "立即解锁"
+        }
     },
     "errors": {
         "unknown": "发生未知错误。",
-        "generateProposalTitle": "生成方案时出错"
+        "generateProposalTitle": "生成方案时出错",
+        "invalidPhone": "请输入有效的11位中国大陆手机号码。"
     }
 }
