@@ -37,6 +37,22 @@ const focusAreaOptions = [
   { label: "节能环保", value: "energy" },
 ];
 
+const lightingStyleOptions = [
+    { label: "意式极简", value: "italian-minimalist" },
+    { label: "现代简约", value: "modern-simple" },
+    { label: "法式", value: "french" },
+    { label: "美式", value: "american" },
+    { label: "海派", value: "shanghai-style" },
+    { label: "奶油风", value: "creamy-style" },
+];
+
+const ecosystemOptions = [
+    { label: "米家", value: "米家" },
+    { label: "Aqara", value: "Aqara" },
+    { label: "Yeelight Pro", value: "YeelightPro" },
+    { label: "HomeKit", value: "HomeKit" },
+];
+
 const CustomProductSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -44,6 +60,7 @@ const CustomProductSchema = z.object({
   category: z.string(),
   price: z.number(),
   budget_level: z.enum(['economy', 'premium', 'luxury']),
+  ecosystem: z.array(z.string()),
   description: z.string(),
 });
 
@@ -56,6 +73,8 @@ const formSchema = z.object({
   budgetLevel: z.enum(['economy', 'premium', 'luxury'], { required_error: 'Please select a budget tier.' }),
   householdProfile: z.array(z.string()).optional(),
   focusAreas: z.array(z.string()).optional(),
+  lightingStyle: z.string().optional(),
+  ecosystem: z.string().optional(),
   customNeeds: z.string().optional(),
   floorPlan: z.instanceof(File).optional(),
   customProductsJson: z.string().optional(),
@@ -69,6 +88,7 @@ const templateJson = [
         "category": "网关",
         "price": 199,
         "budget_level": "economy",
+        "ecosystem": ["米家", "HomeKit"],
         "description": "这是一个用户自定义的产品示例，用于家庭的中央控制。"
     },
     {
@@ -78,6 +98,7 @@ const templateJson = [
         "category": "灯光",
         "price": 88,
         "budget_level": "premium",
+        "ecosystem": ["Hue"],
         "description": "高品质彩色智能灯泡。"
     }
 ];
@@ -95,6 +116,8 @@ export function PlanningForm() {
       layout: '3r2l2b',
       householdProfile: [],
       focusAreas: [],
+      lightingStyle: 'modern-simple',
+      ecosystem: '米家',
       customNeeds: '',
       customProductsJson: '',
     },
@@ -150,6 +173,9 @@ export function PlanningForm() {
     formData.append('layout', values.layout);
     formData.append('budgetLevel', values.budgetLevel);
     formData.append('customNeeds', values.customNeeds || '');
+    formData.append('lightingStyle', values.lightingStyle || '');
+    formData.append('ecosystem', values.ecosystem || '');
+
 
     (values.householdProfile || []).forEach(value => {
         formData.append('householdProfile[]', value);
@@ -356,6 +382,54 @@ export function PlanningForm() {
                     </FormItem>
                   )}
                 />
+                <div className="grid md:grid-cols-2 gap-6">
+                    <FormField
+                    control={form.control}
+                    name="lightingStyle"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>照明设计风格</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                            <SelectTrigger>
+                                <SelectValue placeholder="请选择一种照明风格" />
+                            </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                            {lightingStyleOptions.map(option => (
+                                <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
+                            ))}
+                            </SelectContent>
+                        </Select>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                    />
+                    <FormField
+                    control={form.control}
+                    name="ecosystem"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>优先智能生态</FormLabel>
+                            <RadioGroup
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                                className="flex flex-wrap gap-x-4 gap-y-2 pt-2"
+                            >
+                                {ecosystemOptions.map(option => (
+                                <FormItem key={option.value} className="flex items-center space-x-2">
+                                    <FormControl>
+                                    <RadioGroupItem value={option.value} id={`eco-${option.value}`} />
+                                    </FormControl>
+                                    <Label htmlFor={`eco-${option.value}`}>{option.label}</Label>
+                                </FormItem>
+                                ))}
+                            </RadioGroup>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                    />
+                </div>
             </div>
             
             <div className="space-y-6">

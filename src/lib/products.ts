@@ -8,6 +8,7 @@ export type Product = {
   category: string;
   price: number;
   budget_level: 'economy' | 'premium' | 'luxury';
+  ecosystem: string[];
   description: string;
   image_id: string;
   imageUrl: string;

@@ -8,13 +8,14 @@ export async function generateProposalAction(
   formData: FormData
 ): Promise<{ proposal?: Proposal; error?: string }> {
   try {
-    const defaultSimplifiedProducts = products.map(({ id, name, category, price, budget_level, brand, description }) => ({
+    const defaultSimplifiedProducts = products.map(({ id, name, category, price, budget_level, brand, description, ecosystem }) => ({
       'id': id,
       '名称': name,
       '品牌': brand,
       '品类': category,
       '价格': price,
       '预算等级': budget_level,
+      '生态': ecosystem,
       '描述': description
     }));
 
@@ -31,10 +32,11 @@ export async function generateProposalAction(
           '品类': p.category,
           '价格': p.price,
           '预算等级': p.budget_level,
+          '生态': p.ecosystem,
           '描述': p.description,
           '来源': '用户自定义' // Add a tag for custom products
         }));
-        combinedProducts = [...defaultSimplifiedProducts, ...simplifiedCustomProducts];
+        combinedProducts = [...simplifiedCustomProducts, ...defaultSimplifiedProducts];
       } catch (e) {
         console.error("Failed to parse or process custom products JSON", e);
         // Continue with default products if custom ones are invalid
@@ -49,6 +51,9 @@ export async function generateProposalAction(
     const budgetLevel = formData.get('budgetLevel') as 'economy' | 'premium' | 'luxury';
     const customNeeds = formData.get('customNeeds') as string;
     const floorPlanFile = formData.get('floorPlan');
+    const lightingStyle = formData.get('lightingStyle') as string;
+    const ecosystem = formData.get('ecosystem') as string;
+
     
     const householdProfile = formData.getAll('householdProfile[]') as string[];
     const focusAreas = formData.getAll('focusAreas[]') as string[];
@@ -66,6 +71,8 @@ export async function generateProposalAction(
       budgetLevel,
       householdProfile,
       focusAreas,
+      lightingStyle,
+      ecosystem,
       customNeeds,
       floorPlanDataUri,
       productsJson,
