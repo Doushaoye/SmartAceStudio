@@ -19,7 +19,7 @@ export function ContactSection() {
                         <div className="space-y-2 flex flex-col items-center">
                             <h3 className="font-semibold">企业微信 (WeCom)</h3>
                             <Image 
-                                src="/wechat-qrcode.jpg"
+                                src="https://picsum.photos/seed/wechat/128/128"
                                 alt="WeCom QR Code"
                                 width={128}
                                 height={128}
@@ -29,7 +29,7 @@ export function ContactSection() {
                         <div className="space-y-2 flex flex-col items-center">
                             <h3 className="font-semibold">抖音 (Douyin)</h3>
                              <Image 
-                                src="/douyin-qrcode.jpg"
+                                src="https://picsum.photos/seed/douyin/128/128"
                                 alt="Douyin QR Code"
                                 width={128}
                                 height={128}

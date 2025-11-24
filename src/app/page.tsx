@@ -9,11 +9,11 @@ import { Card, CardContent } from '@/components/ui/card';
 import { ContactSection } from '@/components/contact-section';
 
 const showcaseImages = [
-  '/showimage/1.jpg',
-  '/showimage/2.jpg',
-  '/showimage/3.jpg',
-  '/showimage/4.jpg',
-  '/showimage/5.jpg',
+  'https://picsum.photos/seed/showcase1/600/400',
+  'https://picsum.photos/seed/showcase2/600/400',
+  'https://picsum.photos/seed/showcase3/600/400',
+  'https://picsum.photos/seed/showcase4/600/400',
+  'https://picsum.photos/seed/showcase5/600/400',
 ];
 
 export default function Home() {
