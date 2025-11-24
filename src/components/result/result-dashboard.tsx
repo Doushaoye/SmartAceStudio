@@ -26,11 +26,17 @@ export function ResultDashboard({ proposal }: ResultDashboardProps) {
 
   const groupedByRoom = useMemo(() => {
     return enrichedItems.reduce<Record<string, EnrichedItem[]>>((acc, item) => {
-      const room = item.room || 'General';
-      if (!acc[room]) {
-        acc[room] = [];
-      }
-      acc[room].push(item);
+      const roomField = item.room || 'General';
+      // Split rooms by comma or Chinese comma, and trim whitespace
+      const rooms = roomField.split(/,|、/).map(r => r.trim()).filter(Boolean);
+      
+      rooms.forEach(room => {
+        if (!acc[room]) {
+          acc[room] = [];
+        }
+        acc[room].push(item);
+      });
+
       return acc;
     }, {});
   }, [enrichedItems]);
