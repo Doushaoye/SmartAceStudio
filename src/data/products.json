@@ -8,9 +8,7 @@
       "budget_level": "economy",
       "ecosystem": ["Aqara", "HomeKit"],
       "description": "新一代Zigbee 3.0网关，自带夜灯功能。",
-      "image_id": "1001",
-      "imageUrl": "https://picsum.photos/seed/1001/400/400",
-      "imageHint": "smart hub"
+      "imageUrl": "https://picsum.photos/seed/1001/400/400"
     },
     {
       "id": "1002",
@@ -21,9 +19,7 @@
       "budget_level": "premium",
       "ecosystem": ["Aqara", "HomeKit"],
       "description": "多协议网关，支持红外遥控，功能更强大。",
-      "image_id": "1002",
-      "imageUrl": "https://picsum.photos/seed/1002/400/400",
-      "imageHint": "smart hub"
+      "imageUrl": "https://picsum.photos/seed/1002/400/400"
     },
     {
       "id": "2001",
@@ -34,9 +30,7 @@
       "budget_level": "economy",
       "ecosystem": ["Aqara"],
       "description": "智能墙壁开关，无需改动原有线路。",
-      "image_id": "2001",
-      "imageUrl": "https://picsum.photos/seed/2001/400/400",
-      "imageHint": "light switch"
+      "imageUrl": "https://picsum.photos/seed/2001/400/400"
     },
     {
       "id": "2002",
@@ -47,9 +41,7 @@
       "budget_level": "economy",
       "ecosystem": ["Aqara"],
       "description": "智能墙壁开关，控制两路灯光。",
-      "image_id": "2002",
-      "imageUrl": "https://picsum.photos/seed/2002/400/400",
-      "imageHint": "light switch"
+      "imageUrl": "https://picsum.photos/seed/2002/400/400"
     },
     {
       "id": "2003",
@@ -60,9 +52,7 @@
       "budget_level": "premium",
       "ecosystem": ["Lutron", "HomeKit"],
       "description": "高端智能开关，支持精准调光。",
-      "image_id": "2003",
-      "imageUrl": "https://picsum.photos/seed/2003/400/400",
-      "imageHint": "dimmer switch"
+      "imageUrl": "https://picsum.photos/seed/2003/400/400"
     },
     {
       "id": "3001",
@@ -73,9 +63,7 @@
       "budget_level": "economy",
       "ecosystem": ["Aqara"],
       "description": "让传统电器秒变智能。",
-      "image_id": "3001",
-      "imageUrl": "https://picsum.photos/seed/3001/400/400",
-      "imageHint": "smart plug"
+      "imageUrl": "https://picsum.photos/seed/3001/400/400"
     },
     {
       "id": "3002",
@@ -86,9 +74,7 @@
       "budget_level": "economy",
       "ecosystem": ["TP-Link", "Google Assistant", "Amazon Alexa"],
       "description": "经济实惠，性能可靠的Wi-Fi智能插座。",
-      "image_id": "3002",
-      "imageUrl": "https://picsum.photos/seed/3002/400/400",
-      "imageHint": "smart plug"
+      "imageUrl": "https://picsum.photos/seed/3002/400/400"
     },
     {
       "id": "4001",
@@ -99,9 +85,7 @@
       "budget_level": "premium",
       "ecosystem": ["Hue", "HomeKit", "Google Assistant", "Amazon Alexa"],
       "description": "1600万色智能LED灯泡，氛围营造大师。",
-      "image_id": "4001",
-      "imageUrl": "https://picsum.photos/seed/4001/400/400",
-      "imageHint": "light bulb"
+      "imageUrl": "https://picsum.photos/seed/4001/400/400"
     },
     {
       "id": "4002",
@@ -112,9 +96,7 @@
       "budget_level": "economy",
       "ecosystem": ["米家", "Yeelight", "HomeKit"],
       "description": "支持色温亮度调节的智能灯泡。",
-      "image_id": "4002",
-      "imageUrl": "https://picsum.photos/seed/4002/400/400",
-      "imageHint": "light bulb"
+      "imageUrl": "https://picsum.photos/seed/4002/400/400"
     },
     {
       "id": "4003",
@@ -125,9 +107,7 @@
       "budget_level": "luxury",
       "ecosystem": ["Nanoleaf", "HomeKit", "Google Assistant", "Amazon Alexa"],
       "description": "模块化智能背光灯条，打造个性光墙。",
-      "image_id": "4003",
-      "imageUrl": "https://picsum.photos/seed/4003/400/400",
-      "imageHint": "ambient lighting"
+      "imageUrl": "https://picsum.photos/seed/4003/400/400"
     },
     {
       "id": "5001",
@@ -138,9 +118,7 @@
       "budget_level": "economy",
       "ecosystem": ["Aqara"],
       "description": "检测人体移动，触发自动化场景。",
-      "image_id": "5001",
-      "imageUrl": "https://picsum.photos/seed/5001/400/400",
-      "imageHint": "motion sensor"
+      "imageUrl": "https://picsum.photos/seed/5001/400/400"
     },
     {
       "id": "5002",
@@ -151,9 +129,7 @@
       "budget_level": "premium",
       "ecosystem": ["Hue", "HomeKit"],
       "description": "无线电池供电，用于Hue系统的动态感应器。",
-      "image_id": "5002",
-      "imageUrl": "https://picsum.photos/seed/5002/400/400",
-      "imageHint": "motion sensor"
+      "imageUrl": "https://picsum.photos/seed/5002/400/400"
     },
     {
       "id": "6001",
@@ -164,9 +140,7 @@
       "budget_level": "economy",
       "ecosystem": ["Aqara"],
       "description": "实时检测门窗开合状态。",
-      "image_id": "6001",
-      "imageUrl": "https://picsum.photos/seed/6001/400/400",
-      "imageHint": "contact sensor"
+      "imageUrl": "https://picsum.photos/seed/6001/400/400"
     },
     {
       "id": "6002",
@@ -177,9 +151,7 @@
       "budget_level": "premium",
       "ecosystem": ["Amazon Alexa"],
       "description": "Ring安防生态系统的一部分。",
-      "image_id": "6002",
-      "imageUrl": "https://picsum.photos/seed/6002/400/400",
-      "imageHint": "contact sensor"
+      "imageUrl": "https://picsum.photos/seed/6002/400/400"
     },
     {
       "id": "7001",
@@ -190,9 +162,7 @@
       "budget_level": "economy",
       "ecosystem": ["Aqara"],
       "description": "让现有窗帘自动化。",
-      "image_id": "7001",
-      "imageUrl": "https://picsum.photos/seed/7001/400/400",
-      "imageHint": "curtain motor"
+      "imageUrl": "https://picsum.photos/seed/7001/400/400"
     },
     {
       "id": "7002",
@@ -203,9 +173,7 @@
       "budget_level": "luxury",
       "ecosystem": ["Somfy"],
       "description": "高端超静音窗帘电机，适用于大型窗帘。",
-      "image_id": "7002",
-      "imageUrl": "https://picsum.photos/seed/7002/400/400",
-      "imageHint": "curtain track"
+      "imageUrl": "https://picsum.photos/seed/7002/400/400"
     },
     {
       "id": "8001",
@@ -216,9 +184,7 @@
       "budget_level": "premium",
       "ecosystem": ["Aqara", "HomeKit"],
       "description": "多种解锁方式，包括指纹和NFC。",
-      "image_id": "8001",
-      "imageUrl": "https://picsum.photos/seed/8001/400/400",
-      "imageHint": "smart lock"
+      "imageUrl": "https://picsum.photos/seed/8001/400/400"
     },
     {
       "id": "8002",
@@ -229,9 +195,7 @@
       "budget_level": "premium",
       "ecosystem": ["Eufy", "Google Assistant", "Amazon Alexa"],
       "description": "指纹扫描和Wi-Fi连接。",
-      "image_id": "8002",
-      "imageUrl": "https://picsum.photos/seed/8002/400/400",
-      "imageHint": "smart lock"
+      "imageUrl": "https://picsum.photos/seed/8002/400/400"
     },
     {
       "id": "8003",
@@ -242,9 +206,7 @@
       "budget_level": "premium",
       "ecosystem": ["August", "HomeKit", "Google Assistant", "Amazon Alexa"],
       "description": "改装智能锁，可附加到现有锁舌上。",
-      "image_id": "8003",
-      "imageUrl": "https://picsum.photos/seed/8003/400/400",
-      "imageHint": "door lock"
+      "imageUrl": "https://picsum.photos/seed/8003/400/400"
     },
     {
       "id": "9001",
@@ -255,9 +217,7 @@
       "budget_level": "luxury",
       "ecosystem": ["Google Assistant", "Matter"],
       "description": "带摄像头和强大扬声器的智能显示屏。",
-      "image_id": "9001",
-      "imageUrl": "https://picsum.photos/seed/9001/400/400",
-      "imageHint": "smart display"
+      "imageUrl": "https://picsum.photos/seed/9001/400/400"
     },
     {
       "id": "9002",
@@ -268,9 +228,7 @@
       "budget_level": "luxury",
       "ecosystem": ["Amazon Alexa", "Matter"],
       "description": "可随您移动的智能显示屏。",
-      "image_id": "9002",
-      "imageUrl": "https://picsum.photos/seed/9002/400/400",
-      "imageHint": "smart display"
+      "imageUrl": "https://picsum.photos/seed/9002/400/400"
     },
     {
       "id": "2004",
@@ -281,9 +239,7 @@
       "budget_level": "luxury",
       "ecosystem": ["Brilliant", "HomeKit", "Google Assistant", "Amazon Alexa"],
       "description": "一体化智能家居控制面板，可替换标准电灯开关。",
-      "image_id": "2004",
-      "imageUrl": "https://picsum.photos/seed/2004/400/400",
-      "imageHint": "smart controller"
+      "imageUrl": "https://picsum.photos/seed/2004/400/400"
     },
     {
       "id": "4004",
@@ -294,9 +250,7 @@
       "budget_level": "economy",
       "ecosystem": ["IKEA Home smart"],
       "description": "经济实惠的智能灯泡，支持基础调光。",
-      "image_id": "4004",
-      "imageUrl": "https://picsum.photos/seed/4004/400/400",
-      "imageHint": "light bulb"
+      "imageUrl": "https://picsum.photos/seed/4004/400/400"
     },
     {
       "id": "4005",
@@ -307,9 +261,7 @@
       "budget_level": "premium",
       "ecosystem": ["LIFX", "HomeKit", "Google Assistant", "Amazon Alexa"],
       "description": "色彩鲜艳，无需集线器。",
-      "image_id": "4005",
-      "imageUrl": "https://picsum.photos/seed/4005/400/400",
-      "imageHint": "light bulb"
+      "imageUrl": "https://picsum.photos/seed/4005/400/400"
     },
     {
       "id": "5003",
@@ -320,9 +272,7 @@
       "budget_level": "luxury",
       "ecosystem": ["Z-Wave"],
       "description": "六合一Z-Wave传感器：运动、温度、湿度、光线、紫外线、振动。",
-      "image_id": "5003",
-      "imageUrl": "https://picsum.photos/seed/5003/400/400",
-      "imageHint": "multisensor"
+      "imageUrl": "https://picsum.photos/seed/5003/400/400"
     },
     {
       "id": "7003",
@@ -333,9 +283,7 @@
       "budget_level": "economy",
       "ecosystem": ["SwitchBot", "Google Assistant", "Amazon Alexa"],
       "description": "易于安装的改装窗帘机器人。",
-      "image_id": "7003",
-      "imageUrl": "https://picsum.photos/seed/7003/400/400",
-      "imageHint": "curtain robot"
+      "imageUrl": "https://picsum.photos/seed/7003/400/400"
     },
     {
       "id": "8004",
@@ -346,9 +294,7 @@
       "budget_level": "economy",
       "ecosystem": ["Wyze", "Google Assistant", "Amazon Alexa"],
       "description": "价格实惠的智能锁，可与您现有的锁舌配合使用。",
-      "image_id": "8004",
-      "imageUrl": "https://picsum.photos/seed/8004/400/400",
-      "imageHint": "door lock"
+      "imageUrl": "https://picsum.photos/seed/8004/400/400"
     },
     {
       "id": "1003",
@@ -359,9 +305,7 @@
       "budget_level": "premium",
       "ecosystem": ["Hubitat", "Z-Wave", "Zigbee"],
       "description": "本地处理以提高速度和可靠性。",
-      "image_id": "1003",
-      "imageUrl": "https://picsum.photos/seed/1003/400/400",
-      "imageHint": "smart hub"
+      "imageUrl": "https://picsum.photos/seed/1003/400/400"
     },
     {
       "id": "4006",
@@ -372,9 +316,7 @@
       "budget_level": "luxury",
       "ecosystem": ["Dyson Link"],
       "description": "可追踪本地日光的智能任务灯。",
-      "image_id": "4006",
-      "imageUrl": "https://picsum.photos/seed/4006/400/400",
-      "imageHint": "desk lamp"
+      "imageUrl": "https://picsum.photos/seed/4006/400/400"
     },
     {
       "id": "2005",
@@ -385,9 +327,7 @@
       "budget_level": "economy",
       "ecosystem": ["eWeLink", "Amazon Alexa", "Google Assistant"],
       "description": "带有触觉反馈和氛围灯的智能墙壁开关。",
-      "image_id": "2005",
-      "imageUrl": "https://picsum.photos/seed/2005/400/400",
-      "imageHint": "wall switch"
+      "imageUrl": "https://picsum.photos/seed/2005/400/400"
     },
     {
       "id": "3003",
@@ -398,9 +338,7 @@
       "budget_level": "premium",
       "ecosystem": ["HomeKit", "Matter"],
       "description": "支持Thread协议，并带有电量监控功能的智能插座。",
-      "image_id": "3003",
-      "imageUrl": "https://picsum.photos/seed/3003/400/400",
-      "imageHint": "smart plug"
+      "imageUrl": "https://picsum.photos/seed/3003/400/400"
     },
     {
         "id": "1004",
@@ -411,9 +349,7 @@
         "budget_level": "economy",
         "ecosystem": ["米家", "HomeKit"],
         "description": "米家生态系统的核心，连接Zigbee、Wi-Fi、蓝牙设备。",
-        "image_id": "1004",
-        "imageUrl": "https://picsum.photos/seed/1004/400/400",
-        "imageHint": "smart hub"
+        "imageUrl": "https://picsum.photos/seed/1004/400/400"
     }
   ]
   

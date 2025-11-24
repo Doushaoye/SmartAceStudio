@@ -1,4 +1,3 @@
-import productsData from '@/data/products.json';
 import type { GenerateSmartHomeProductsOutput } from '@/ai/flows/generate-smart-home-products';
 
 export type Product = {
@@ -10,12 +9,8 @@ export type Product = {
   budget_level: 'economy' | 'premium' | 'luxury';
   ecosystem: string[];
   description: string;
-  image_id: string;
   imageUrl: string;
-  imageHint: string;
 };
-
-export const products: Product[] = productsData;
 
 export type SelectedItem = NonNullable<GenerateSmartHomeProductsOutput['selectedItems']>[0];
 

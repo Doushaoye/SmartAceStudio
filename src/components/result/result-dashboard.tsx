@@ -108,7 +108,6 @@ export function ResultDashboard({ proposal }: ResultDashboardProps) {
                                                 width={60}
                                                 height={60}
                                                 className="rounded-md object-cover"
-                                                data-ai-hint={item.imageHint}
                                             />
                                         </TableCell>
                                         <TableCell>

@@ -62,6 +62,7 @@ const CustomProductSchema = z.object({
   budget_level: z.enum(['economy', 'premium', 'luxury']),
   ecosystem: z.array(z.string()),
   description: z.string(),
+  imageUrl: z.string().url().optional(),
 });
 
 const CustomProductsStoreSchema = z.array(CustomProductSchema);
@@ -89,7 +90,8 @@ const templateJson = [
         "price": 199,
         "budget_level": "economy",
         "ecosystem": ["米家", "HomeKit"],
-        "description": "这是一个用户自定义的产品示例，用于家庭的中央控制。"
+        "description": "这是一个用户自定义的产品示例，用于家庭的中央控制。",
+        "imageUrl": "https://picsum.photos/seed/USER-001/400/400"
     },
     {
         "id": "USER-002",
@@ -99,7 +101,8 @@ const templateJson = [
         "price": 88,
         "budget_level": "premium",
         "ecosystem": ["Hue"],
-        "description": "高品质彩色智能灯泡。"
+        "description": "高品质彩色智能灯泡。",
+        "imageUrl": "https://picsum.photos/seed/USER-002/400/400"
     }
 ];
 
@@ -144,8 +147,15 @@ export function PlanningForm() {
         try {
           const content = e.target?.result as string;
           const parsed = JSON.parse(content);
-          CustomProductsStoreSchema.parse(parsed); // Validate schema
-          form.setValue('customProductsJson', content);
+          
+          // Validate and assign UUIDs
+          const validatedProducts = CustomProductsStoreSchema.parse(parsed);
+          const productsWithIds = validatedProducts.map(p => ({
+            ...p,
+            id: `USER-${crypto.randomUUID()}`
+          }));
+
+          form.setValue('customProductsJson', JSON.stringify(productsWithIds));
           setCustomProductsFile(file);
           toast({
             title: "上传成功",
