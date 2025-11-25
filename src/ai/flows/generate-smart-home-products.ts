@@ -186,7 +186,7 @@ ${input.productsJson}
   }
 
   const stream = await openai.chat.completions.create({
-      model: 'Qwen/Qwen3-VL-30B-A3B-Instruct',
+      model: 'Qwen/Qwen3-VL-8B-Instruct',
       messages: messages,
       temperature: 0.5,
       stream: true,
