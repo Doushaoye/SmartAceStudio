@@ -4,6 +4,7 @@ import type { Proposal, Product } from '@/lib/products';
 import { generateSmartHomeProducts } from '@/ai/flows/generate-smart-home-products';
 import { products } from '@/lib/products-data';
 import Papa from 'papaparse';
+import crypto from 'crypto';
 
 function toChineseKeys(product: any, isCustom: boolean) {
   const result: any = {
