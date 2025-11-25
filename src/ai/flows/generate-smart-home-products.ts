@@ -120,6 +120,13 @@ function toChineseKeys(product: any, isCustom: boolean) {
 }
 
 export async function generateSmartHomeProducts(input: GenerateSmartHomeProductsInput): Promise<Proposal> {
+    console.log('[FLOW_STEP] 1/7: Starting smart home product generation.');
+
+    if (!process.env.SILICONFLOW_API_KEY) {
+        console.error('[FLOW_ERROR] Missing SILICONFLOW_API_KEY.');
+        throw new Error('缺少 SILICONFLOW_API_KEY，请设置环境变量以使用 AI 功能。');
+    }
+
     const customProductsForEnrichment: Product[] = [];
     
     let productsJson = JSON.stringify(products.map(p => toChineseKeys(p, false)));
@@ -155,7 +162,8 @@ export async function generateSmartHomeProducts(input: GenerateSmartHomeProducts
         const defaultSimplifiedProducts = products.map(p => toChineseKeys(p, false));
         productsJson = JSON.stringify([...simplifiedCustomProducts, ...defaultSimplifiedProducts]);
     }
-  
+    console.log('[FLOW_STEP] 2/7: Prepared product data.');
+
     const tagContext = getContextFromTags(input);
 
     const selectionPrompt = `你是一位AI智能家居顾问。请分析用户的房产信息、预算和需求，推荐一份智能家居产品清单。请使用中文进行回复。
@@ -222,6 +230,7 @@ ${productsJson}
         },
       });
     }
+    console.log('[FLOW_STEP] 3/7: Calling AI for product selection.');
 
     const response = await openai.chat.completions.create({
         model: 'Qwen/Qwen3-VL-8B-Instruct',
@@ -229,6 +238,7 @@ ${productsJson}
         temperature: 0.5,
         response_format: { type: 'json_object' },
     });
+    console.log('[FLOW_STEP] 4/7: AI response received.');
 
     const content = response.choices[0].message.content;
     if (!content) {
@@ -242,7 +252,8 @@ ${productsJson}
       console.error("Failed to parse AI response for product selection:", error, content);
       throw new Error(`AI 产品选择失败: ${error instanceof Error ? error.message : String(error)}`);
     }
-    
+    console.log('[FLOW_STEP] 5/7: Parsed AI selection.');
+
     const allProducts: Product[] = [...products, ...customProductsForEnrichment];
     const productMap = new Map(allProducts.map(p => [p.id, p]));
 
@@ -251,6 +262,7 @@ ${productsJson}
         return acc + (product ? product.price * item.quantity : 0);
     }, 0);
 
+    console.log('[FLOW_STEP] 6/7: Calling AI for analysis report.');
     const reportResult = await generateAnalysisReport({
         budgetLevel: input.budgetLevel,
         selectedItems: parsedSelection.selectedItems,
@@ -272,5 +284,6 @@ ${productsJson}
         enrichedItems: enrichedItems,
     };
 
+    console.log('[FLOW_STEP] 7/7: Smart home product generation finished.');
     return finalProposal;
 }
