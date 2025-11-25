@@ -11,7 +11,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
-import { useProposal } from '@/context/proposal-context';
 import { DollarSign, Zap, Gem, ArrowRight, FileUp, User, Heart, Baby, Accessibility, Cat, Download, Upload, FileText } from 'lucide-react';
 import { useI18n } from '@/context/i18n-context';
 import { LoadingAnimation } from './loading-animation';
@@ -73,7 +72,8 @@ const csvTemplateContent = `${csvTemplateHeader}\n自定义产品A,自定义品�
 
 
 export function PlanningForm() {
-  const { isLoading, startProposalGeneration } = useProposal();
+  const [isLoading, setIsLoading] = useState(false);
+  const [submittedData, setSubmittedData] = useState<FormData | null>(null);
   const { t } = useI18n();
   const { toast } = useToast();
   const [customProductsFile, setCustomProductsFile] = useState<File | null>(null);
@@ -179,11 +179,12 @@ export function PlanningForm() {
       formData.append('productsCsv', values.customProductsCsv);
     }
 
-    startProposalGeneration(formData);
+    setSubmittedData(formData);
+    setIsLoading(true);
   };
   
   if (isLoading) {
-    return <LoadingAnimation />;
+    return <LoadingAnimation formData={submittedData} />;
   }
 
   return (

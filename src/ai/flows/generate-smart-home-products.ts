@@ -3,9 +3,8 @@
 /**
  * @fileOverview This file defines the flow for generating smart home product recommendations.
  *
- * - generateSmartHomeProducts - A function that orchestrates the smart home product recommendation process.
- * - GenerateSmartHomeProductsInput - The input type for the generateSmartHomeProducts function.
- * - GenerateSmartHomeProductsOutput - The return type for the generateSmartHomeProducts function.
+ * - generateSmartHomeProductsStream - A function that orchestrates the smart home product recommendation process and streams the output.
+ * - GenerateSmartHomeProductsInput - The input type for the function.
  */
 
 import { z } from 'zod';
@@ -13,6 +12,9 @@ import OpenAI from 'openai';
 import { generateAnalysisReport } from './generate-analysis-report';
 import type { Product } from '@/lib/products';
 import { products } from '@/lib/products-data';
+import crypto from 'crypto';
+import Papa from 'papaparse';
+
 
 const openai = new OpenAI({
   apiKey: process.env.SILICONFLOW_API_KEY,
@@ -36,22 +38,10 @@ const GenerateSmartHomeProductsInputSchema = z.object({
       "A photo of the floor plan, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'"
     ),
   customNeeds: z.string().describe('Any custom needs or preferences specified by the user.'),
-  productsJson: z.string().describe('The JSON content of the available products database. This could be user-provided or the system default.'),
+  productsCsv: z.string().optional().describe('The CSV content of the user-provided products.'),
 });
 export type GenerateSmartHomeProductsInput = z.infer<typeof GenerateSmartHomeProductsInputSchema>;
 
-const GenerateSmartHomeProductsOutputSchema = z.object({
-  selectedItems: z.array(
-    z.object({
-      product_id: z.string().describe('The ID of the selected product.'),
-      quantity: z.number().describe('The quantity of the product needed.'),
-      room: z.string().describe('The room where the product will be used.'),
-      reason: z.string().describe('The reason for selecting this product.'),
-    })
-  ).describe('The list of selected smart home products.'),
-  analysisReport: z.string().describe('The analysis report in markdown format.'),
-});
-export type GenerateSmartHomeProductsOutput = z.infer<typeof GenerateSmartHomeProductsOutputSchema>;
 
 // Helper function to convert tags to natural language
 function getContextFromTags(input: GenerateSmartHomeProductsInput): string {
@@ -112,10 +102,70 @@ const ProductSelectionOutputSchema = z.object({
   ).describe('The list of selected smart home products.'),
 });
 
-export async function generateSmartHomeProducts(input: GenerateSmartHomeProductsInput): Promise<GenerateSmartHomeProductsOutput> {
-  const tagContext = getContextFromTags(input);
 
-  const selectionPrompt = `你是一位AI智能家居顾问。请分析用户的房产信息、预算和需求，推荐一份智能家居产品清单。请使用中文进行回复。
+function toChineseKeys(product: any, isCustom: boolean) {
+  const result: any = {
+    'ID': product.id,
+    '名称': product.name,
+    '品牌': product.brand,
+    '品类': product.category,
+    '价格': product.price,
+    '生态': product.ecosystem,
+    '描述': product.description,
+  };
+  if (isCustom) {
+    result['来源'] = '用户自定义';
+  }
+  return result;
+}
+
+const PROPOSAL_SENTINEL = '__PROPOSAL_SENTINEL__';
+
+export async function generateSmartHomeProductsStream(input: GenerateSmartHomeProductsInput): Promise<ReadableStream> {
+    const encoder = new TextEncoder();
+    const customProductsForEnrichment: Product[] = [];
+    
+    let productsJson = JSON.stringify(products.map(p => toChineseKeys(p, false)));
+
+    if (input.productsCsv) {
+        const parseResult = Papa.parse(input.productsCsv, {
+            header: true,
+            skipEmptyLines: true,
+        });
+
+        if (parseResult.errors.length > 0) {
+            throw new Error(`CSV parsing error: ${parseResult.errors.map(e => e.message).join(', ')}`);
+        }
+        
+        const customProductsData: any[] = parseResult.data;
+
+        const simplifiedCustomProducts = customProductsData.map((row: any) => {
+            const customProduct: Product = {
+                id: `USER-${crypto.randomUUID()}`,
+                name: row['产品名称'],
+                brand: row['品牌'],
+                category: row['品类'],
+                price: Number(row['价格']),
+                ecosystem: row['生态平台(用;分隔)']?.split(';').map((e: string) => e.trim()).filter(Boolean) || [],
+                description: row['产品描述'],
+                budget_level: 'economy', // Default to economy
+                imageUrl: `https://picsum.photos/seed/${crypto.randomUUID()}/400/400`,
+            };
+            customProductsForEnrichment.push(customProduct);
+            return toChineseKeys(customProduct, true);
+        });
+        
+        const defaultSimplifiedProducts = products.map(p => toChineseKeys(p, false));
+        productsJson = JSON.stringify([...simplifiedCustomProducts, ...defaultSimplifiedProducts]);
+    }
+  
+    const readableStream = new ReadableStream({
+    async start(controller) {
+      controller.enqueue(encoder.encode('[PROGRESS] AI 正在选择产品...\n'));
+
+      const tagContext = getContextFromTags(input);
+
+      const selectionPrompt = `你是一位AI智能家居顾问。请分析用户的房产信息、预算和需求，推荐一份智能家居产品清单。请使用中文进行回复。
 
 房产信息:
 面积: ${input.area} 平方米
@@ -129,7 +179,7 @@ export async function generateSmartHomeProducts(input: GenerateSmartHomeProducts
 1.  全屋都需要配置智能开关，不要为了省钱而选择用普通开关替代智能开关。
 2.  卧室、客厅区域至少要配置一对3键开关实现灯光的双控，如果这个空间还有电动窗帘则需要考虑补充更多的开关。
 3.  卫生间，厨房区域配置1键或2键开关即可。
-4.  阳台区域因为有电动窗帘和晾衣架，建议用三键开关。
+4san.  阳台区域因为有电动窗帘和晾衣架，建议用三键开关。
 5.  玄关区域推荐使用3键或者智能屏来实现回家离家模式等场景控制需求。
 
 预算选择规则 (重要):
@@ -150,7 +200,7 @@ ${input.customNeeds || "无"}
 ${input.floorPlanDataUri ? `平面图: [Image Attached]` : ''}
 
 产品库 (你必须从此列表里选择产品，产品属性描述均为中文，特别是要遵守【生态平台选择规则】和【智能开关选择规则】):
-${input.productsJson}
+${productsJson}
 
 请根据以上所有信息，特别是用户的画像、核心需求和手写需求，并严格遵守所有规则，从提供的产品库中选择适合用户的智能家居产品。在选择时，请综合考虑用户的预算和需求。"room" 和 "reason" 字段必须使用中文。
 
@@ -162,95 +212,96 @@ ${input.productsJson}
   ]
 }
 `;
+      const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
+        {
+          role: 'user',
+          content: [
+            { type: 'text', text: selectionPrompt },
+          ],
+        },
+      ];
 
-  const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
-    {
-      role: 'user',
-      content: [
-        { type: 'text', text: selectionPrompt },
-      ],
-    },
-  ];
+      if (input.floorPlanDataUri) {
+        (messages[0].content as any[]).push({
+          type: 'image_url',
+          image_url: {
+            url: input.floorPlanDataUri,
+          },
+        });
+      }
 
-  if (input.floorPlanDataUri) {
-    (messages[0].content as any[]).push({
-      type: 'image_url',
-      image_url: {
-        url: input.floorPlanDataUri,
-      },
-    });
-  }
+      const stream = await openai.chat.completions.create({
+          model: 'Qwen/Qwen3-VL-8B-Instruct',
+          messages: messages,
+          temperature: 0.5,
+          response_format: { type: 'json_object' },
+          stream: true,
+      });
 
-  const response = await openai.chat.completions.create({
-      model: 'Qwen/Qwen3-VL-8B-Instruct',
-      messages: messages,
-      temperature: 0.5,
-      response_format: { type: 'json_object' },
+      let fullContent = '';
+      for await (const chunk of stream) {
+        const content = chunk.choices[0]?.delta?.content || '';
+        fullContent += content;
+        controller.enqueue(encoder.encode(content));
+      }
+
+      let parsedSelection: z.infer<typeof ProductSelectionOutputSchema>;
+      try {
+        const jsonMatch = fullContent.match(/\{[\s\S]*\}/);
+        if (!jsonMatch) throw new Error("Valid JSON object for selectedItems not found.");
+        parsedSelection = ProductSelectionOutputSchema.parse(JSON.parse(jsonMatch[0]));
+      } catch (error) {
+        console.error("Failed to parse AI response for product selection:", error, fullContent);
+        controller.enqueue(encoder.encode(`[ERROR] AI 产品选择失败: ${error instanceof Error ? error.message : String(error)}`));
+        controller.close();
+        return;
+      }
+      
+      controller.enqueue(encoder.encode('\n\n[PROGRESS] AI 正在撰写分析报告...\n'));
+      
+      let analysisReport = '';
+      try {
+          const allProducts: Product[] = [...products, ...customProductsForEnrichment];
+          const productMap = new Map(allProducts.map(p => [p.id, p]));
+
+          const totalCost = parsedSelection.selectedItems.reduce((acc, item) => {
+              const product = productMap.get(item.product_id);
+              return acc + (product ? product.price * item.quantity : 0);
+          }, 0);
+
+          const reportResult = await generateAnalysisReport({
+              budgetLevel: input.budgetLevel,
+              selectedItems: parsedSelection.selectedItems,
+              totalPrice: totalCost,
+              area: input.area,
+              layout: input.layout,
+              customNeeds: input.customNeeds,
+          });
+          analysisReport = reportResult.analysisReport;
+
+      } catch (reportError) {
+          console.error("Failed to generate analysis report:", reportError);
+          analysisReport = "AI分析报告生成失败，但产品清单已成功创建。";
+      }
+
+      const allProductsForEnrichment: Product[] = [...products, ...customProductsForEnrichment];
+      const productMap = new Map<string, Product>(allProductsForEnrichment.map((p) => [p.id, p]));
+      
+      const enrichedItems = parsedSelection.selectedItems.map(item => {
+          const product = productMap.get(item.product_id);
+          if (!product) return null;
+          return { ...item, ...product };
+      }).filter(Boolean);
+
+      const finalProposal = {
+          analysisReport: analysisReport,
+          enrichedItems: enrichedItems,
+      };
+
+      controller.enqueue(encoder.encode(`\n${PROPOSAL_SENTINEL}` + JSON.stringify(finalProposal)));
+      controller.close();
+    }
   });
 
-  const content = response.choices[0].message.content;
-  if (!content) {
-    throw new Error('AI returned an empty response for product selection.');
-  }
-
-  let parsedSelection: z.infer<typeof ProductSelectionOutputSchema>;
-  try {
-    const jsonMatch = content.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      throw new Error("Valid JSON object for selectedItems not found in the AI response.");
-    }
-    parsedSelection = ProductSelectionOutputSchema.parse(JSON.parse(jsonMatch[0]));
-  } catch (error) {
-    console.error("Failed to parse AI response for product selection:", error, content);
-    throw new Error('AI returned invalid JSON format for product selection.');
-  }
-
-  // Use a separate call to generate the analysis report.
-  let analysisReport = '';
-  try {
-    const allProducts: Product[] = JSON.parse(input.productsJson, (key, value) => {
-        // The CSV parser might leave IDs as numbers, ensure they are strings
-        if (key === 'ID') {
-            return String(value);
-        }
-        return value;
-    }).map((p: any) => ({ // map to Product type
-        id: p.ID,
-        name: p.名称,
-        brand: p.品牌,
-        category: p.品类,
-        price: Number(p.价格),
-        budget_level: p.budget_level || 'economy', 
-        ecosystem: Array.isArray(p.生态) ? p.生态 : (p.生态 || '').split(';'),
-        description: p.描述,
-        imageUrl: p.imageUrl || `https://picsum.photos/seed/${p.ID}/400/400`,
-    }));
-    
-    const productMap = new Map(allProducts.map(p => [p.id, p]));
-
-    const totalCost = parsedSelection.selectedItems.reduce((acc, item) => {
-        const product = productMap.get(item.product_id);
-        return acc + (product ? product.price * item.quantity : 0);
-    }, 0);
-
-    const reportResult = await generateAnalysisReport({
-        budgetLevel: input.budgetLevel,
-        selectedItems: parsedSelection.selectedItems,
-        totalPrice: totalCost,
-        area: input.area,
-        layout: input.layout,
-        customNeeds: input.customNeeds,
-    });
-    analysisReport = reportResult.analysisReport;
-
-  } catch (reportError) {
-      console.error("Failed to generate analysis report:", reportError);
-      // If report generation fails, we can still proceed with an empty report
-      analysisReport = "AI分析报告生成失败，但产品清单已成功创建。";
-  }
-
-  return {
-    selectedItems: parsedSelection.selectedItems,
-    analysisReport: analysisReport,
-  };
+  return readableStream;
 }
