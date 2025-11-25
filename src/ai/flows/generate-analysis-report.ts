@@ -77,18 +77,15 @@ export async function generateAnalysisReport(input: GenerateAnalysisReportInput)
 
   const content = response.choices[0].message.content;
   if (!content) {
-    throw new Error('AI returned an empty response.');
+    throw new Error('AI returned an empty response for analysis report.');
   }
 
   try {
     const parsedJson = JSON.parse(content);
-    // Add validation for the parsed JSON
-    if (typeof parsedJson.analysisReport !== 'string') {
-       throw new Error('The "analysisReport" key is missing or not a string.');
-    }
     return GenerateAnalysisReportOutputSchema.parse(parsedJson);
   } catch (error) {
-    console.error("Failed to parse AI response for analysis report:", error, content);
+    console.error("[解析错误] AI分析报告返回的JSON格式无效:", content);
+    console.error(error);
     throw new Error('AI returned invalid JSON format for analysis report.');
   }
 }

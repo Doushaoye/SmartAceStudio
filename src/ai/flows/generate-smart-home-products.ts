@@ -231,19 +231,14 @@ ${productsJson}
         },
       });
     }
-    console.log('[流程步骤] 3/7: 正在并行调用 AI 进行产品选择和报告生成...');
-
-    const productSelectionPromise = openai.chat.completions.create({
+    
+    console.log('[流程步骤] 3/7: 正在调用 AI 进行产品选择...');
+    const productSelectionResponse = await openai.chat.completions.create({
         model: process.env.AI_MODEL_NAME || 'Qwen/Qwen3-VL-8B-Instruct',
         messages: messages,
         temperature: 0.5,
         response_format: { type: 'json_object' },
     });
-
-    const [productSelectionResponse] = await Promise.all([
-      productSelectionPromise
-    ]);
-
     console.log('[流程步骤] 4/7: 已收到 AI 的产品选择响应。');
 
     const content = productSelectionResponse.choices[0].message.content;
@@ -290,7 +285,7 @@ ${productsJson}
         analysisReport: analysisReport,
         enrichedItems: enrichedItems,
     };
-
-    console.log('[流程步骤] 7/7: 智能家居方案生成完毕。');
+    
+    console.log(`[流程步骤] 7/7: 智能家居方案生成完毕。报告长度: ${finalProposal.analysisReport.length}, 产品数量: ${finalProposal.enrichedItems.length}`);
     return finalProposal;
 }
