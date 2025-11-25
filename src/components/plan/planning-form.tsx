@@ -77,7 +77,6 @@ export function PlanningForm() {
   const { t } = useI18n();
   const { toast } = useToast();
   const [customProductsFile, setCustomProductsFile] = useState<File | null>(null);
-  const [submittedData, setSubmittedData] = useState<FormData | null>(null);
 
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -181,11 +180,10 @@ export function PlanningForm() {
     }
 
     startProposalGeneration(formData);
-    setSubmittedData(formData);
   };
   
-  if (isLoading && submittedData) {
-    return <LoadingAnimation formData={submittedData} />;
+  if (isLoading) {
+    return <LoadingAnimation />;
   }
 
   return (

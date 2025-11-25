@@ -1,9 +1,9 @@
 'use server';
 
 /**
- * @fileOverview This file defines the flow for generating smart home product recommendations based on user inputs, using a direct OpenAI-compatible API call.
+ * @fileOverview This file defines the flow for generating smart home product recommendations.
  *
- * - generateSmartHomeProductsStream - A function that orchestrates the smart home product recommendation process via streaming.
+ * - generateSmartHomeProducts - A function that orchestrates the smart home product recommendation process.
  * - GenerateSmartHomeProductsInput - The input type for the generateSmartHomeProducts function.
  * - GenerateSmartHomeProductsOutput - The return type for the generateSmartHomeProducts function.
  */
@@ -11,8 +11,8 @@
 import { z } from 'zod';
 import OpenAI from 'openai';
 import { generateAnalysisReport } from './generate-analysis-report';
-import { products } from '@/lib/products-data';
 import type { Product } from '@/lib/products';
+import { products } from '@/lib/products-data';
 
 const openai = new OpenAI({
   apiKey: process.env.SILICONFLOW_API_KEY,
@@ -98,7 +98,6 @@ function getContextFromTags(input: GenerateSmartHomeProductsInput): string {
             break;
     }
 
-
     return context;
 }
 
@@ -113,8 +112,7 @@ const ProductSelectionOutputSchema = z.object({
   ).describe('The list of selected smart home products.'),
 });
 
-// This function now returns a stream
-export async function generateSmartHomeProductsStream(input: GenerateSmartHomeProductsInput): Promise<ReadableStream<Uint8Array>> {
+export async function generateSmartHomeProducts(input: GenerateSmartHomeProductsInput): Promise<GenerateSmartHomeProductsOutput> {
   const tagContext = getContextFromTags(input);
 
   const selectionPrompt = `你是一位AI智能家居顾问。请分析用户的房产信息、预算和需求，推荐一份智能家居产品清单。请使用中文进行回复。
@@ -156,9 +154,7 @@ ${input.productsJson}
 
 请根据以上所有信息，特别是用户的画像、核心需求和手写需求，并严格遵守所有规则，从提供的产品库中选择适合用户的智能家居产品。在选择时，请综合考虑用户的预算和需求。"room" 和 "reason" 字段必须使用中文。
 
-重要：你的思考过程和最终的JSON输出都将直接展示给用户。请先输出你的思考过程，例如 "正在分析客厅的需求..."，"为卧室选择灯光..."。
-在你完成所有产品选择后，必须严格按照以下格式输出一个 JSON 对象，且该对象前后不能有任何其他文本或 markdown 格式。这是最后一步。
-
+你的回复必须是一个符合以下 ProductSelectionOutputSchema 格式的 JSON 对象，不能包含任何额外的解释或 markdown 格式。
 最终 JSON 对象结构示例:
 {
   "selectedItems": [
@@ -185,88 +181,76 @@ ${input.productsJson}
     });
   }
 
-  const stream = await openai.chat.completions.create({
+  const response = await openai.chat.completions.create({
       model: 'Qwen/Qwen3-VL-8B-Instruct',
       messages: messages,
       temperature: 0.5,
-      stream: true,
+      response_format: { type: 'json_object' },
   });
 
-  const encoder = new TextEncoder();
-  
-  const readableStream = new ReadableStream({
-    async start(controller) {
-      let fullContent = '';
-      for await (const chunk of stream) {
-          const content = chunk.choices[0]?.delta?.content || '';
-          fullContent += content;
-          controller.enqueue(encoder.encode(content));
-      }
+  const content = response.choices[0].message.content;
+  if (!content) {
+    throw new Error('AI returned an empty response for product selection.');
+  }
 
-      try {
-        // Find the JSON part of the response
-        let jsonString = '';
-        const jsonMatch = fullContent.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-          jsonString = jsonMatch[0];
-        } else {
-          throw new Error("Valid JSON object for selectedItems not found in the AI response.");
-        }
-
-        const parsedSelection = ProductSelectionOutputSchema.parse(JSON.parse(jsonString));
-
-        // Generate analysis report based on the selection
-        const allProducts: Product[] = JSON.parse(input.productsJson, (key, value) => {
-            if (key === 'ID') {
-                return String(value);
-            }
-            return value;
-        }).map((p: any) => ({
-            id: p.ID,
-            name: p.名称,
-            brand: p.品牌,
-            category: p.品类,
-            price: Number(p.价格),
-            budget_level: p.budget_level || 'economy', 
-            ecosystem: Array.isArray(p.生态) ? p.生态 : (p.生态 || '').split(';'),
-            description: p.描述,
-            imageUrl: p.imageUrl || `https://picsum.photos/seed/${p.ID}/400/400`,
-        }));
-        
-        const productMap = new Map(allProducts.map(p => [p.id, p]));
-
-        const totalCost = parsedSelection.selectedItems.reduce((acc, item) => {
-            const product = productMap.get(item.product_id);
-            return acc + (product ? product.price * item.quantity : 0);
-        }, 0);
-
-        const reportResult = await generateAnalysisReport({
-            budgetLevel: input.budgetLevel,
-            selectedItems: parsedSelection.selectedItems,
-            totalPrice: totalCost,
-            area: input.area,
-            layout: input.layout,
-            customNeeds: input.customNeeds,
-        });
-
-        const finalResult = {
-            selectedItems: parsedSelection.selectedItems,
-            analysisReport: reportResult.analysisReport,
-        };
-
-        // Send the final complete proposal object as a separate chunk with a sentinel
-        const finalPayload = `__PROPOSAL_SENTINEL__${JSON.stringify(finalResult)}`;
-        controller.enqueue(encoder.encode(finalPayload));
-
-      } catch (e) {
-          console.error("Error processing stream end:", e, "\nFull AI content:\n", fullContent);
-          const errorMsg = e instanceof Error ? e.message : "An unexpected error occurred.";
-          controller.error(new Error(`Stream processing failed: ${errorMsg}`));
-      }
-
-      controller.close();
+  let parsedSelection: z.infer<typeof ProductSelectionOutputSchema>;
+  try {
+    const jsonMatch = content.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      throw new Error("Valid JSON object for selectedItems not found in the AI response.");
     }
-  });
+    parsedSelection = ProductSelectionOutputSchema.parse(JSON.parse(jsonMatch[0]));
+  } catch (error) {
+    console.error("Failed to parse AI response for product selection:", error, content);
+    throw new Error('AI returned invalid JSON format for product selection.');
+  }
 
-  return readableStream;
+  // Use a separate call to generate the analysis report.
+  let analysisReport = '';
+  try {
+    const allProducts: Product[] = JSON.parse(input.productsJson, (key, value) => {
+        // The CSV parser might leave IDs as numbers, ensure they are strings
+        if (key === 'ID') {
+            return String(value);
+        }
+        return value;
+    }).map((p: any) => ({ // map to Product type
+        id: p.ID,
+        name: p.名称,
+        brand: p.品牌,
+        category: p.品类,
+        price: Number(p.价格),
+        budget_level: p.budget_level || 'economy', 
+        ecosystem: Array.isArray(p.生态) ? p.生态 : (p.生态 || '').split(';'),
+        description: p.描述,
+        imageUrl: p.imageUrl || `https://picsum.photos/seed/${p.ID}/400/400`,
+    }));
+    
+    const productMap = new Map(allProducts.map(p => [p.id, p]));
+
+    const totalCost = parsedSelection.selectedItems.reduce((acc, item) => {
+        const product = productMap.get(item.product_id);
+        return acc + (product ? product.price * item.quantity : 0);
+    }, 0);
+
+    const reportResult = await generateAnalysisReport({
+        budgetLevel: input.budgetLevel,
+        selectedItems: parsedSelection.selectedItems,
+        totalPrice: totalCost,
+        area: input.area,
+        layout: input.layout,
+        customNeeds: input.customNeeds,
+    });
+    analysisReport = reportResult.analysisReport;
+
+  } catch (reportError) {
+      console.error("Failed to generate analysis report:", reportError);
+      // If report generation fails, we can still proceed with an empty report
+      analysisReport = "AI分析报告生成失败，但产品清单已成功创建。";
+  }
+
+  return {
+    selectedItems: parsedSelection.selectedItems,
+    analysisReport: analysisReport,
+  };
 }

@@ -6,16 +6,16 @@ import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import type { Proposal } from '@/lib/products';
 import { useI18n } from './i18n-context';
+import { generateProposalAction } from '@/app/actions';
 
 interface ProposalContextType {
   proposal: Proposal | null;
   isLoading: boolean;
   error: string | null;
   startProposalGeneration: (data: FormData) => void;
-  setProposal: (proposal: Proposal | null) => void;
+  setProposal: (proposal: Proposal | null) => void; // Keep for direct setting if needed
   setIsLoading: (isLoading: boolean) => void;
   setError: (error: string | null) => void;
-  handleStreamingError: (err: any) => void;
 }
 
 const ProposalContext = createContext<ProposalContextType | undefined>(undefined);
@@ -28,38 +28,49 @@ export function ProposalProvider({ children }: { children: ReactNode }) {
   const { toast } = useToast();
   const { t } = useI18n();
 
-  const startProposalGeneration = useCallback((data: FormData) => {
+  const startProposalGeneration = useCallback(async (data: FormData) => {
     setIsLoading(true);
     setError(null);
     setProposalState(null);
-    // The actual generation is handled by the LoadingAnimation component, which gets triggered by isLoading=true
-  }, []);
+    
+    const result = await generateProposalAction(data);
 
-  const setProposal = useCallback((proposal: Proposal | null) => {
-    if (proposal) {
-        setProposalState(proposal);
-        setIsLoading(false);
-        router.push('/result');
-    } else {
-       setError("Received an empty proposal.");
-       setIsLoading(false);
-    }
-  }, [router]);
-  
-  const handleStreamingError = useCallback((err: any) => {
-      const errorMessage = err instanceof Error ? err.message : t('errors.unknown');
-      setError(errorMessage);
+    if (result.error) {
+      setError(result.error);
       toast({
         variant: 'destructive',
         title: t('errors.generateProposalTitle'),
-        description: errorMessage,
+        description: result.error,
       });
       setIsLoading(false);
-  }, [t, toast]);
+    } else if (result.proposal) {
+      setProposalState(result.proposal);
+      setIsLoading(false);
+      router.push('/result');
+    } else {
+        const fallbackError = "Generation finished without a proposal or an error.";
+        setError(fallbackError);
+        toast({
+            variant: 'destructive',
+            title: t('errors.generateProposalTitle'),
+            description: fallbackError,
+        });
+        setIsLoading(false);
+    }
+  }, [router, t, toast]);
 
-
+  // This function can be used if we need to set the proposal from somewhere else
+  const setProposal = useCallback((newProposal: Proposal | null) => {
+    setProposalState(newProposal);
+    if (newProposal) {
+        setIsLoading(false);
+        setError(null);
+        router.push('/result');
+    }
+  }, [router]);
+  
   return (
-    <ProposalContext.Provider value={{ proposal, isLoading, error, startProposalGeneration, setProposal, setIsLoading, setError, handleStreamingError }}>
+    <ProposalContext.Provider value={{ proposal, isLoading, error, startProposalGeneration, setProposal, setIsLoading, setError }}>
       {children}
     </ProposalContext.Provider>
   );
