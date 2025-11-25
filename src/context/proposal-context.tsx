@@ -11,7 +11,7 @@ interface ProposalContextType {
   proposal: Proposal | null;
   isLoading: boolean;
   error: string | null;
-  generateProposal: (data: FormData) => void;
+  startProposalGeneration: (data: FormData) => void;
   setProposal: (proposal: Proposal | null) => void;
   setIsLoading: (isLoading: boolean) => void;
   setError: (error: string | null) => void;
@@ -28,17 +28,21 @@ export function ProposalProvider({ children }: { children: ReactNode }) {
   const { toast } = useToast();
   const { t } = useI18n();
 
-  const generateProposal = useCallback((data: FormData) => {
+  const startProposalGeneration = useCallback((data: FormData) => {
     setIsLoading(true);
     setError(null);
-    // The actual generation is now handled by the LoadingAnimation component
+    setProposalState(null);
+    // The actual generation is handled by the LoadingAnimation component, which gets triggered by isLoading=true
   }, []);
 
   const setProposal = useCallback((proposal: Proposal | null) => {
-    setProposalState(proposal);
     if (proposal) {
+        setProposalState(proposal);
         setIsLoading(false);
         router.push('/result');
+    } else {
+       setError("Received an empty proposal.");
+       setIsLoading(false);
     }
   }, [router]);
   
@@ -55,7 +59,7 @@ export function ProposalProvider({ children }: { children: ReactNode }) {
 
 
   return (
-    <ProposalContext.Provider value={{ proposal, isLoading, error, generateProposal, setProposal, setIsLoading, setError, handleStreamingError }}>
+    <ProposalContext.Provider value={{ proposal, isLoading, error, startProposalGeneration, setProposal, setIsLoading, setError, handleStreamingError }}>
       {children}
     </ProposalContext.Provider>
   );

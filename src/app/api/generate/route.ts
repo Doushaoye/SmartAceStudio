@@ -2,10 +2,8 @@
 import { generateSmartHomeProductsStream } from '@/ai/flows/generate-smart-home-products';
 import { type NextRequest } from 'next/server';
 import type { Product } from '@/lib/products';
-import productsData from '@/data/products.json';
+import { products } from '@/lib/products-data';
 import Papa from 'papaparse';
-
-const products: Product[] = productsData as Product[];
 
 function toChineseKeys(product: any, isCustom: boolean) {
   const result: any = {
@@ -23,13 +21,13 @@ function toChineseKeys(product: any, isCustom: boolean) {
   return result;
 }
 
-export const runtime = 'edge'; // Use edge runtime for streaming
+export const runtime = 'nodejs';
+export const maxDuration = 120;
 
 export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();
     
-    // --- Start: Duplicated logic from actions.ts ---
     const defaultSimplifiedProducts = products.map(p => toChineseKeys(p, false));
     let combinedProducts = [...defaultSimplifiedProducts];
     
@@ -46,16 +44,24 @@ export async function POST(req: NextRequest) {
           throw new Error(`CSV parsing error: ${parseResult.errors.map(e => e.message).join(', ')}`);
         }
         
-        const customProducts: any[] = parseResult.data;
-        const simplifiedCustomProducts = customProducts.map(p => toChineseKeys({
-          id: `USER-${crypto.randomUUID()}`,
-          name: p['产品名称'],
-          brand: p['品牌'],
-          category: p['品类'],
-          price: Number(p['价格']),
-          ecosystem: p['生态平台(用;分隔)']?.split(';').map((e: string) => e.trim()).filter(Boolean) || [],
-          description: p['产品描述'],
-        }, true));
+        const customProductsData: any[] = parseResult.data;
+
+        const simplifiedCustomProducts = customProductsData.map((row: any) => {
+            const customProduct = {
+                id: `USER-${crypto.randomUUID()}`,
+                name: row['产品名称'],
+                brand: row['品牌'],
+                category: row['品类'],
+                price: Number(row['价格']),
+                ecosystem: row['生态平台(用;分隔)']?.split(';').map((e: string) => e.trim()).filter(Boolean) || [],
+                description: row['产品描述'],
+                budget_level: 'economy',
+                imageUrl: `https://picsum.photos/seed/${crypto.randomUUID()}/400/400`,
+            };
+            // Add the full product to the enrichment list later
+            products.push(customProduct); 
+            return toChineseKeys(customProduct, true);
+        });
         
         combinedProducts = [...simplifiedCustomProducts, ...defaultSimplifiedProducts];
 
@@ -64,7 +70,6 @@ export async function POST(req: NextRequest) {
       }
     }
     const productsJson = JSON.stringify(combinedProducts);
-    // --- End: Duplicated logic ---
     
     const area = Number(formData.get('area'));
     const layout = formData.get('layout') as '2r1l1b' | '3r2l1b' | '3r2l2b' | '4r2l2b' | '4r2l3b';

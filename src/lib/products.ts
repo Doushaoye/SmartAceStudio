@@ -1,5 +1,3 @@
-import type { GenerateSmartHomeProductsOutput } from '@/ai/flows/generate-smart-home-products';
-
 export type Product = {
   id: string;
   name: string;
@@ -12,7 +10,12 @@ export type Product = {
   imageUrl: string;
 };
 
-export type SelectedItem = NonNullable<GenerateSmartHomeProductsOutput['selectedItems']>[0];
+export type SelectedItem = {
+    product_id: string;
+    quantity: number;
+    room: string;
+    reason: string;
+};
 
 export type EnrichedItem = SelectedItem & Product;
 

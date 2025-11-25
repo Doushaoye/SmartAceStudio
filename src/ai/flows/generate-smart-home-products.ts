@@ -3,7 +3,7 @@
 /**
  * @fileOverview This file defines the flow for generating smart home product recommendations based on user inputs, using a direct OpenAI-compatible API call.
  *
- * - generateSmartHomeProducts - A function that orchestrates the smart home product recommendation process.
+ * - generateSmartHomeProductsStream - A function that orchestrates the smart home product recommendation process via streaming.
  * - GenerateSmartHomeProductsInput - The input type for the generateSmartHomeProducts function.
  * - GenerateSmartHomeProductsOutput - The return type for the generateSmartHomeProducts function.
  */
@@ -11,7 +11,8 @@
 import { z } from 'zod';
 import OpenAI from 'openai';
 import { generateAnalysisReport } from './generate-analysis-report';
-import { products } from '@/lib/products';
+import { products } from '@/lib/products-data';
+import type { Product } from '@/lib/products';
 
 const openai = new OpenAI({
   apiKey: process.env.SILICONFLOW_API_KEY,
@@ -204,19 +205,39 @@ ${input.productsJson}
 
       try {
         // Find the JSON part of the response
-        const jsonStart = fullContent.lastIndexOf('{');
-        const jsonEnd = fullContent.lastIndexOf('}');
-        if (jsonStart === -1 || jsonEnd === -1 || jsonEnd < jsonStart) {
-            throw new Error("Valid JSON object for selectedItems not found in the AI response.");
+        let jsonString = '';
+        const jsonMatch = fullContent.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          jsonString = jsonMatch[0];
+        } else {
+          throw new Error("Valid JSON object for selectedItems not found in the AI response.");
         }
-        const jsonString = fullContent.substring(jsonStart, jsonEnd + 1);
+
         const parsedSelection = ProductSelectionOutputSchema.parse(JSON.parse(jsonString));
 
         // Generate analysis report based on the selection
-        const productMap = new Map(JSON.parse(input.productsJson).map((p: any) => [p.ID, p]));
+        const allProducts: Product[] = JSON.parse(input.productsJson, (key, value) => {
+            if (key === 'ID') {
+                return String(value);
+            }
+            return value;
+        }).map((p: any) => ({
+            id: p.ID,
+            name: p.名称,
+            brand: p.品牌,
+            category: p.品类,
+            price: Number(p.价格),
+            budget_level: p.budget_level || 'economy', 
+            ecosystem: Array.isArray(p.生态) ? p.生态 : (p.生态 || '').split(';'),
+            description: p.描述,
+            imageUrl: p.imageUrl || `https://picsum.photos/seed/${p.ID}/400/400`,
+        }));
+        
+        const productMap = new Map(allProducts.map(p => [p.id, p]));
+
         const totalCost = parsedSelection.selectedItems.reduce((acc, item) => {
             const product = productMap.get(item.product_id);
-            return acc + (product ? product.价格 * item.quantity : 0);
+            return acc + (product ? product.price * item.quantity : 0);
         }, 0);
 
         const reportResult = await generateAnalysisReport({
@@ -234,11 +255,11 @@ ${input.productsJson}
         };
 
         // Send the final complete proposal object as a separate chunk with a sentinel
-        const finalPayload = `__PROPOSAL_SENTINEL__=${JSON.stringify(finalResult)}`;
+        const finalPayload = `__PROPOSAL_SENTINEL__${JSON.stringify(finalResult)}`;
         controller.enqueue(encoder.encode(finalPayload));
 
       } catch (e) {
-          console.error("Error processing stream end:", e);
+          console.error("Error processing stream end:", e, "\nFull AI content:\n", fullContent);
           const errorMsg = e instanceof Error ? e.message : "An unexpected error occurred.";
           controller.error(new Error(`Stream processing failed: ${errorMsg}`));
       }

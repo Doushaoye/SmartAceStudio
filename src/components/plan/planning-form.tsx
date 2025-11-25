@@ -73,7 +73,7 @@ const csvTemplateContent = `${csvTemplateHeader}\n自定义产品A,自定义品�
 
 
 export function PlanningForm() {
-  const { isLoading, generateProposal } = useProposal();
+  const { isLoading, startProposalGeneration } = useProposal();
   const { t } = useI18n();
   const { toast } = useToast();
   const [customProductsFile, setCustomProductsFile] = useState<File | null>(null);
@@ -180,7 +180,7 @@ export function PlanningForm() {
       formData.append('productsCsv', values.customProductsCsv);
     }
 
-    generateProposal(formData);
+    startProposalGeneration(formData);
     setSubmittedData(formData);
   };
   
