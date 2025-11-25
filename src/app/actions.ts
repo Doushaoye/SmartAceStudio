@@ -1,10 +1,10 @@
 'use server';
 
-import type { Proposal, Product, EnrichedItem } from '@/lib/products';
+import type { Proposal, Product } from '@/lib/products';
 import { generateSmartHomeProducts } from '@/ai/flows/generate-smart-home-products';
-import { products } from '@/lib/products-data';
-import Papa from 'papaparse';
 import crypto from 'crypto';
+import Papa from 'papaparse';
+
 
 export async function generateProposalAction(
   formData: FormData
@@ -40,38 +40,8 @@ export async function generateProposalAction(
       floorPlanDataUri,
       productsCsv: customProductsCsv,
     });
-
-    const customProductsForEnrichment: Product[] = [];
-    if (customProductsCsv) {
-        const parseResult = Papa.parse(customProductsCsv, {
-            header: true,
-            skipEmptyLines: true,
-        });
-        const customProductsData: any[] = parseResult.data;
-        customProductsData.forEach((row: any) => {
-            const customProduct: Product = {
-                id: `USER-${crypto.randomUUID()}`, // This ID is temporary and local
-                name: row['产品名称'],
-                brand: row['品牌'],
-                category: row['品类'],
-                price: Number(row['价格']),
-                ecosystem: row['生态平台(用;分隔)']?.split(';').map((e: string) => e.trim()).filter(Boolean) || [],
-                description: row['产品描述'],
-                budget_level: 'economy',
-                imageUrl: `https://picsum.photos/seed/${crypto.randomUUID()}/400/400`,
-            };
-            customProductsForEnrichment.push(customProduct);
-        });
-    }
-
-    // It's crucial to use the exact same logic for product enrichment as used inside the flow
-    // We will rely on the `enrichedItems` returned from the flow itself.
-    const finalProposal: Proposal = {
-      analysisReport: result.analysisReport,
-      enrichedItems: result.enrichedItems,
-    };
-
-    return { proposal: finalProposal };
+    
+    return { proposal: result };
 
   } catch (error) {
     console.error('Error in generateProposalAction:', error);

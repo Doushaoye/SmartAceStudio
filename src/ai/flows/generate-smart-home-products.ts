@@ -231,17 +231,22 @@ ${productsJson}
         },
       });
     }
-    console.log('[流程步骤] 3/7: 正在调用 AI 进行产品选择...');
+    console.log('[流程步骤] 3/7: 正在并行调用 AI 进行产品选择和报告生成...');
 
-    const response = await openai.chat.completions.create({
+    const productSelectionPromise = openai.chat.completions.create({
         model: process.env.AI_MODEL_NAME || 'Qwen/Qwen3-VL-8B-Instruct',
         messages: messages,
         temperature: 0.5,
         response_format: { type: 'json_object' },
     });
+
+    const [productSelectionResponse] = await Promise.all([
+      productSelectionPromise
+    ]);
+
     console.log('[流程步骤] 4/7: 已收到 AI 的产品选择响应。');
 
-    const content = response.choices[0].message.content;
+    const content = productSelectionResponse.choices[0].message.content;
     if (!content) {
         throw new Error('AI 返回了空的产品选择内容。');
     }
@@ -272,11 +277,12 @@ ${productsJson}
         layout: input.layout,
         customNeeds: input.customNeeds,
     });
+    
     const analysisReport = reportResult.analysisReport;
 
     const enrichedItems = parsedSelection.selectedItems.map(item => {
         const product = productMap.get(item.product_id);
-        if (!product) return null; // Should not happen if AI follows prompt
+        if (!product) return null;
         return { ...item, ...product };
     }).filter((item): item is EnrichedItem => item !== null);
 

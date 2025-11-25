@@ -19,8 +19,6 @@ import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import Papa from 'papaparse';
 import { useProposal } from '@/context/proposal-context';
-import { generateProposalAction } from '@/app/actions';
-
 
 const householdProfileOptions = [
   { label: "独居青年", value: "single", icon: User },
@@ -74,7 +72,7 @@ const csvTemplateContent = `${csvTemplateHeader}\n自定义产品A,自定义品�
 
 
 export function PlanningForm() {
-  const { isLoading, setIsLoading, setProposal, setError } = useProposal();
+  const { isLoading, startProposalGeneration } = useProposal();
   const { t } = useI18n();
   const { toast } = useToast();
   const [customProductsFile, setCustomProductsFile] = useState<File | null>(null);
@@ -155,9 +153,6 @@ export function PlanningForm() {
   };
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    setIsLoading(true);
-    setError(null);
-
     const formData = new FormData();
     formData.append('area', String(values.area));
     formData.append('layout', values.layout);
@@ -182,19 +177,7 @@ export function PlanningForm() {
       formData.append('productsCsv', values.customProductsCsv);
     }
 
-    const result = await generateProposalAction(formData);
-
-    setIsLoading(false);
-    if (result.error) {
-      setError(result.error);
-      toast({
-        variant: 'destructive',
-        title: t('errors.generateProposalTitle'),
-        description: result.error,
-      });
-    } else if (result.proposal) {
-      setProposal(result.proposal);
-    }
+    startProposalGeneration(formData);
   };
   
   if (isLoading) {
