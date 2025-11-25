@@ -120,10 +120,10 @@ function toChineseKeys(product: any, isCustom: boolean) {
 }
 
 export async function generateSmartHomeProducts(input: GenerateSmartHomeProductsInput): Promise<Proposal> {
-    console.log('[FLOW_STEP] 1/7: Starting smart home product generation.');
+    console.log('[流程步骤] 1/7: 开始智能家居方案生成。接收到输入:', input);
 
     if (!process.env.SILICONFLOW_API_KEY) {
-        console.error('[FLOW_ERROR] Missing SILICONFLOW_API_KEY.');
+        console.error('[流程错误] 缺少 SILICONFLOW_API_KEY，请检查环境变量。');
         throw new Error('缺少 SILICONFLOW_API_KEY，请设置环境变量以使用 AI 功能。');
     }
 
@@ -132,6 +132,7 @@ export async function generateSmartHomeProducts(input: GenerateSmartHomeProducts
     let productsJson = JSON.stringify(products.map(p => toChineseKeys(p, false)));
 
     if (input.productsCsv) {
+        console.log('[流程步骤] 检测到用户上传自定义产品库。');
         const parseResult = Papa.parse(input.productsCsv, {
             header: true,
             skipEmptyLines: true,
@@ -162,7 +163,7 @@ export async function generateSmartHomeProducts(input: GenerateSmartHomeProducts
         const defaultSimplifiedProducts = products.map(p => toChineseKeys(p, false));
         productsJson = JSON.stringify([...simplifiedCustomProducts, ...defaultSimplifiedProducts]);
     }
-    console.log('[FLOW_STEP] 2/7: Prepared product data.');
+    console.log('[流程步骤] 2/7: 已准备好产品数据 JSON。');
 
     const tagContext = getContextFromTags(input);
 
@@ -180,7 +181,7 @@ export async function generateSmartHomeProducts(input: GenerateSmartHomeProducts
 1.  全屋都需要配置智能开关，不要为了省钱而选择用普通开关替代智能开关。
 2.  卧室、客厅区域至少要配置一对3键开关实现灯光的双控，如果这个空间还有电动窗帘则需要考虑补充更多的开关。
 3.  卫生间，厨房区域配置1键或2键开关即可。
-4san.  阳台区域因为有电动窗帘和晾衣架，建议用三键开关。
+4.  阳台区域因为有电动窗帘和晾衣架，建议用三键开关。
 5.  玄关区域推荐使用3键或者智能屏来实现回家离家模式等场景控制需求。
 
 预算选择规则 (重要):
@@ -230,29 +231,29 @@ ${productsJson}
         },
       });
     }
-    console.log('[FLOW_STEP] 3/7: Calling AI for product selection.');
+    console.log('[流程步骤] 3/7: 正在调用 AI 进行产品选择...');
 
     const response = await openai.chat.completions.create({
-        model: 'Qwen/Qwen3-VL-8B-Instruct',
+        model: process.env.AI_MODEL_NAME || 'Qwen/Qwen3-VL-8B-Instruct',
         messages: messages,
         temperature: 0.5,
         response_format: { type: 'json_object' },
     });
-    console.log('[FLOW_STEP] 4/7: AI response received.');
+    console.log('[流程步骤] 4/7: 已收到 AI 的产品选择响应。');
 
     const content = response.choices[0].message.content;
     if (!content) {
-        throw new Error('AI returned empty content for product selection.');
+        throw new Error('AI 返回了空的产品选择内容。');
     }
     
     let parsedSelection: z.infer<typeof ProductSelectionOutputSchema>;
     try {
       parsedSelection = ProductSelectionOutputSchema.parse(JSON.parse(content));
     } catch (error) {
-      console.error("Failed to parse AI response for product selection:", error, content);
-      throw new Error(`AI 产品选择失败: ${error instanceof Error ? error.message : String(error)}`);
+      console.error("解析 AI 产品选择响应失败:", error, "原始响应内容:", content);
+      throw new Error(`AI 产品选择结果解析失败: ${error instanceof Error ? error.message : String(error)}`);
     }
-    console.log('[FLOW_STEP] 5/7: Parsed AI selection.');
+    console.log('[流程步骤] 5/7: 成功解析 AI 产品选择结果。选择的产品数量:', parsedSelection.selectedItems.length);
 
     const allProducts: Product[] = [...products, ...customProductsForEnrichment];
     const productMap = new Map(allProducts.map(p => [p.id, p]));
@@ -262,7 +263,7 @@ ${productsJson}
         return acc + (product ? product.price * item.quantity : 0);
     }, 0);
 
-    console.log('[FLOW_STEP] 6/7: Calling AI for analysis report.');
+    console.log('[流程步骤] 6/7: 正在调用 AI 生成分析报告...');
     const reportResult = await generateAnalysisReport({
         budgetLevel: input.budgetLevel,
         selectedItems: parsedSelection.selectedItems,
@@ -284,6 +285,6 @@ ${productsJson}
         enrichedItems: enrichedItems,
     };
 
-    console.log('[FLOW_STEP] 7/7: Smart home product generation finished.');
+    console.log('[流程步骤] 7/7: 智能家居方案生成完毕。');
     return finalProposal;
 }
