@@ -3,14 +3,14 @@
 /**
  * @fileOverview This file defines the flow for generating smart home product recommendations.
  *
- * - generateSmartHomeProductsStream - A function that orchestrates the smart home product recommendation process and streams the output.
+ * - generateSmartHomeProducts - A function that orchestrates the smart home product recommendation process.
  * - GenerateSmartHomeProductsInput - The input type for the function.
  */
 
 import { z } from 'zod';
 import OpenAI from 'openai';
 import { generateAnalysisReport } from './generate-analysis-report';
-import type { Product } from '@/lib/products';
+import type { Product, EnrichedItem, Proposal } from '@/lib/products';
 import { products } from '@/lib/products-data';
 import crypto from 'crypto';
 import Papa from 'papaparse';
@@ -119,10 +119,7 @@ function toChineseKeys(product: any, isCustom: boolean) {
   return result;
 }
 
-const PROPOSAL_SENTINEL = '__PROPOSAL_SENTINEL__';
-
-export async function generateSmartHomeProductsStream(input: GenerateSmartHomeProductsInput): Promise<ReadableStream> {
-    const encoder = new TextEncoder();
+export async function generateSmartHomeProducts(input: GenerateSmartHomeProductsInput): Promise<Proposal> {
     const customProductsForEnrichment: Product[] = [];
     
     let productsJson = JSON.stringify(products.map(p => toChineseKeys(p, false)));
@@ -159,13 +156,9 @@ export async function generateSmartHomeProductsStream(input: GenerateSmartHomePr
         productsJson = JSON.stringify([...simplifiedCustomProducts, ...defaultSimplifiedProducts]);
     }
   
-    const readableStream = new ReadableStream({
-    async start(controller) {
-      controller.enqueue(encoder.encode('[PROGRESS] AI 正在选择产品...\n'));
+    const tagContext = getContextFromTags(input);
 
-      const tagContext = getContextFromTags(input);
-
-      const selectionPrompt = `你是一位AI智能家居顾问。请分析用户的房产信息、预算和需求，推荐一份智能家居产品清单。请使用中文进行回复。
+    const selectionPrompt = `你是一位AI智能家居顾问。请分析用户的房产信息、预算和需求，推荐一份智能家居产品清单。请使用中文进行回复。
 
 房产信息:
 面积: ${input.area} 平方米
@@ -212,96 +205,72 @@ ${productsJson}
   ]
 }
 `;
-      const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
-        {
-          role: 'user',
-          content: [
-            { type: 'text', text: selectionPrompt },
-          ],
+    const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
+      {
+        role: 'user',
+        content: [
+          { type: 'text', text: selectionPrompt },
+        ],
+      },
+    ];
+
+    if (input.floorPlanDataUri) {
+      (messages[0].content as any[]).push({
+        type: 'image_url',
+        image_url: {
+          url: input.floorPlanDataUri,
         },
-      ];
-
-      if (input.floorPlanDataUri) {
-        (messages[0].content as any[]).push({
-          type: 'image_url',
-          image_url: {
-            url: input.floorPlanDataUri,
-          },
-        });
-      }
-
-      const stream = await openai.chat.completions.create({
-          model: 'Qwen/Qwen3-VL-8B-Instruct',
-          messages: messages,
-          temperature: 0.5,
-          response_format: { type: 'json_object' },
-          stream: true,
       });
-
-      let fullContent = '';
-      for await (const chunk of stream) {
-        const content = chunk.choices[0]?.delta?.content || '';
-        fullContent += content;
-        controller.enqueue(encoder.encode(content));
-      }
-
-      let parsedSelection: z.infer<typeof ProductSelectionOutputSchema>;
-      try {
-        const jsonMatch = fullContent.match(/\{[\s\S]*\}/);
-        if (!jsonMatch) throw new Error("Valid JSON object for selectedItems not found.");
-        parsedSelection = ProductSelectionOutputSchema.parse(JSON.parse(jsonMatch[0]));
-      } catch (error) {
-        console.error("Failed to parse AI response for product selection:", error, fullContent);
-        controller.enqueue(encoder.encode(`[ERROR] AI 产品选择失败: ${error instanceof Error ? error.message : String(error)}`));
-        controller.close();
-        return;
-      }
-      
-      controller.enqueue(encoder.encode('\n\n[PROGRESS] AI 正在撰写分析报告...\n'));
-      
-      let analysisReport = '';
-      try {
-          const allProducts: Product[] = [...products, ...customProductsForEnrichment];
-          const productMap = new Map(allProducts.map(p => [p.id, p]));
-
-          const totalCost = parsedSelection.selectedItems.reduce((acc, item) => {
-              const product = productMap.get(item.product_id);
-              return acc + (product ? product.price * item.quantity : 0);
-          }, 0);
-
-          const reportResult = await generateAnalysisReport({
-              budgetLevel: input.budgetLevel,
-              selectedItems: parsedSelection.selectedItems,
-              totalPrice: totalCost,
-              area: input.area,
-              layout: input.layout,
-              customNeeds: input.customNeeds,
-          });
-          analysisReport = reportResult.analysisReport;
-
-      } catch (reportError) {
-          console.error("Failed to generate analysis report:", reportError);
-          analysisReport = "AI分析报告生成失败，但产品清单已成功创建。";
-      }
-
-      const allProductsForEnrichment: Product[] = [...products, ...customProductsForEnrichment];
-      const productMap = new Map<string, Product>(allProductsForEnrichment.map((p) => [p.id, p]));
-      
-      const enrichedItems = parsedSelection.selectedItems.map(item => {
-          const product = productMap.get(item.product_id);
-          if (!product) return null;
-          return { ...item, ...product };
-      }).filter(Boolean);
-
-      const finalProposal = {
-          analysisReport: analysisReport,
-          enrichedItems: enrichedItems,
-      };
-
-      controller.enqueue(encoder.encode(`\n${PROPOSAL_SENTINEL}` + JSON.stringify(finalProposal)));
-      controller.close();
     }
-  });
 
-  return readableStream;
+    const response = await openai.chat.completions.create({
+        model: 'Qwen/Qwen3-VL-8B-Instruct',
+        messages: messages,
+        temperature: 0.5,
+        response_format: { type: 'json_object' },
+    });
+
+    const content = response.choices[0].message.content;
+    if (!content) {
+        throw new Error('AI returned empty content for product selection.');
+    }
+    
+    let parsedSelection: z.infer<typeof ProductSelectionOutputSchema>;
+    try {
+      parsedSelection = ProductSelectionOutputSchema.parse(JSON.parse(content));
+    } catch (error) {
+      console.error("Failed to parse AI response for product selection:", error, content);
+      throw new Error(`AI 产品选择失败: ${error instanceof Error ? error.message : String(error)}`);
+    }
+    
+    const allProducts: Product[] = [...products, ...customProductsForEnrichment];
+    const productMap = new Map(allProducts.map(p => [p.id, p]));
+
+    const totalCost = parsedSelection.selectedItems.reduce((acc, item) => {
+        const product = productMap.get(item.product_id);
+        return acc + (product ? product.price * item.quantity : 0);
+    }, 0);
+
+    const reportResult = await generateAnalysisReport({
+        budgetLevel: input.budgetLevel,
+        selectedItems: parsedSelection.selectedItems,
+        totalPrice: totalCost,
+        area: input.area,
+        layout: input.layout,
+        customNeeds: input.customNeeds,
+    });
+    const analysisReport = reportResult.analysisReport;
+
+    const enrichedItems = parsedSelection.selectedItems.map(item => {
+        const product = productMap.get(item.product_id);
+        if (!product) return null; // Should not happen if AI follows prompt
+        return { ...item, ...product };
+    }).filter((item): item is EnrichedItem => item !== null);
+
+    const finalProposal: Proposal = {
+        analysisReport: analysisReport,
+        enrichedItems: enrichedItems,
+    };
+
+    return finalProposal;
 }
