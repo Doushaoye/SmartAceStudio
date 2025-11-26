@@ -10,7 +10,6 @@
  */
 
 import { ai } from '@/ai/genkit';
-import { googleAI } from '@genkit-ai/google-genai';
 import { z } from 'zod';
 
 const GenerateAnalysisReportInputSchema = z.object({
@@ -38,9 +37,11 @@ export type GenerateAnalysisReportOutput = z.infer<typeof GenerateAnalysisReport
 
 const reportPrompt = ai.definePrompt({
     name: 'generateAnalysisReportPrompt',
-    model: googleAI.model('gemini-1.5-flash-latest'),
     input: { schema: GenerateAnalysisReportInputSchema },
     output: { schema: GenerateAnalysisReportOutputSchema },
+    config: {
+        model: process.env.AI_MODEL_NAME,
+    },
     prompt: `You are a smart home consultant who provides an analysis report based on the user's smart home plan.
 
   The user has a property with an area of {{area}} sqm and a {{layout}} layout.
@@ -75,6 +76,9 @@ const generateAnalysisReportFlow = ai.defineFlow(
   },
   async (input) => {
     console.log('[流程步骤] 6/7: 正在调用 AI 生成分析报告...');
+    if (!process.env.AI_MODEL_NAME) {
+      throw new Error("AI_MODEL_NAME 环境变量未设置。");
+    }
     const { output } = await reportPrompt(input);
     if (!output) {
       console.error("[解析错误] AI分析报告返回了空内容。");
