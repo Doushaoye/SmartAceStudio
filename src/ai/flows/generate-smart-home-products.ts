@@ -7,7 +7,6 @@
  * - GenerateSmartHomeProductsInput - The input type for the function.
  */
 import { ai } from '@/ai/genkit';
-import { openAI } from '@genkit-ai/compat-oai/openai';
 import { z } from 'zod';
 import { generateAnalysisReport } from './generate-analysis-report';
 import type { Product, EnrichedItem, Proposal } from '@/lib/products';
@@ -114,78 +113,6 @@ function toChineseKeys(product: any, isCustom: boolean) {
   return result;
 }
 
-const selectionPrompt = ai.definePrompt({
-    name: 'generateSmartHomeProductsPrompt',
-    input: { schema: z.object({
-        area: z.number(),
-        layout: z.string(),
-        budgetLevel: z.string(),
-        ecosystem: z.string().optional(),
-        tagContext: z.string(),
-        customNeeds: z.string(),
-        floorPlanDataUri: z.string().optional(),
-        productsJson: z.string(),
-    }) },
-    output: { schema: ProductSelectionOutputSchema },
-    config: {
-        model: openAI.model(process.env.AI_MODEL_NAME!),
-    },
-    prompt: `你是一位AI智能家居顾问。请分析用户的房产信息、预算和需求，推荐一份智能家居产品清单。请使用中文进行回复。
-
-房产信息:
-面积: {{area}} 平方米
-户型: {{layout}}
-预算等级: {{budgetLevel}}
-
-生态平台选择规则 (最重要):
-用户选择的优先智能生态是: 【{{ecosystem}}】。你选择的所有产品，其“生态”字段中必须包含【{{ecosystem}}】这个标签。绝对不能选择任何不兼容该生态的产品。
-
-智能开关选择规则 (最重要):
-1.  全屋都需要配置智能开关，不要为了省钱而选择用普通开关替代智能开关。
-2.  卧室、客厅区域至少要配置一对3键开关实现灯光的双控，如果这个空间还有电动窗帘则需要考虑补充更多的开关。
-3.  卫生间，厨房区域配置1键或2键开关即可。
-4.  阳台区域因为有电动窗帘和晾衣架，建议用三键开关。
-5.  玄关区域推荐使用3键或者智能屏来实现回家离家模式等场景控制需求。
-
-预算选择规则 (重要):
-- 如果预算是 'luxury' (豪华), 你可以使用 'luxury', 'premium', 'economy' 三个等级的产品。
-- 如果预算是 'premium' (高级), 你可以使用 'premium' 和 'economy' 等级的产品。
-- 如果预算是 'economy' (经济), 你应该尽量只选择 'economy' 等级的产品，除非绝对必要。
-
-产品选择规则 (重要):
-- 产品库中有些产品标注了 "来源": "用户自定义"，请优先选择这些产品。
-- 如果用户自定义的产品不足以完成方案设计，你可以从产品库中选择其他产品作为补充。
-
-用户画像、核心需求和灯光风格偏好 (根据用户选择的标签):
-{{{tagContext}}}
-
-用户手写的定制需求:
-{{#if customNeeds}}
-{{customNeeds}}
-{{else}}
-无
-{{/if}}
-
-{{#if floorPlanDataUri}}
-平面图: {{media url=floorPlanDataUri}}
-{{/if}}
-
-产品库 (你必须从此列表里选择产品，产品属性描述均为中文，特别是要遵守【生态平台选择规则】和【智能开关选择规则】):
-{{productsJson}}
-
-请根据以上所有信息，特别是用户的画像、核心需求和手写需求，并严格遵守所有规则，从提供的产品库中选择适合用户的智能家居产品。在选择时，请综合考虑用户的预算和需求。"room" 和 "reason" 字段必须使用中文。
-
-你的回复必须是一个符合以下 ProductSelectionOutputSchema 格式的 JSON 对象，不能包含任何额外的解释或 markdown 格式。
-最终 JSON 对象结构示例:
-{
-  "selectedItems": [
-    { "product_id": "1001", "quantity": 1, "room": "客厅", "reason": "中央控制中心" }
-  ]
-}
-`,
-});
-
-
 const generateSmartHomeProductsFlow = ai.defineFlow(
   {
     name: 'generateSmartHomeProductsFlow',
@@ -249,19 +176,38 @@ const generateSmartHomeProductsFlow = ai.defineFlow(
     
     const tagContext = getContextFromTags(input);
 
-    const promptInput = {
-      area: input.area,
-      layout: input.layout,
-      budgetLevel: input.budgetLevel,
-      ecosystem: input.ecosystem,
-      tagContext: tagContext || "用户未选择特定标签。",
-      customNeeds: input.customNeeds || "无",
-      floorPlanDataUri: input.floorPlanDataUri,
-      productsJson: productsJson,
-    };
+    const promptParts = [
+        `你是一位AI智能家居顾问。请分析用户的房产信息、预算和需求，推荐一份智能家居产品清单。请使用中文进行回复。`,
+        `房产信息:\n面积: ${input.area} 平方米\n户型: ${input.layout}\n预算等级: ${input.budgetLevel}`,
+        `生态平台选择规则 (最重要):\n用户选择的优先智能生态是: 【${input.ecosystem}】。你选择的所有产品，其“生态”字段中必须包含【${input.ecosystem}】这个标签。绝对不能选择任何不兼容该生态的产品。`,
+        `智能开关选择规则 (最重要):\n1.  全屋都需要配置智能开关，不要为了省钱而选择用普通开关替代智能开关。\n2.  卧室、客厅区域至少要配置一对3键开关实现灯光的双控，如果这个空间还有电动窗帘则需要考虑补充更多的开关。\n3.  卫生间，厨房区域配置1键或2键开关即可。\n4.  阳台区域因为有电动窗帘和晾衣架，建议用三键开关。\n5.  玄关区域推荐使用3键或者智能屏来实现回家离家模式等场景控制需求。`,
+        `预算选择规则 (重要):\n- 如果预算是 'luxury' (豪华), 你可以使用 'luxury', 'premium', 'economy' 三个等级的产品。\n- 如果预算是 'premium' (高级), 你可以使用 'premium' 和 'economy' 等级的产品。\n- 如果预算是 'economy' (经济), 你应该尽量只选择 'economy' 等级的产品，除非绝对必要。`,
+        `产品选择规则 (重要):\n- 产品库中有些产品标注了 "来源": "用户自定义"，请优先选择这些产品。\n- 如果用户自定义的产品不足以完成方案设计，你可以从产品库中选择其他产品作为补充。`,
+        `用户画像、核心需求和灯光风格偏好 (根据用户选择的标签):\n${tagContext || "用户未选择特定标签。"}`,
+        `用户手写的定制需求:\n${input.customNeeds || "无"}`,
+    ];
+
+    if (input.floorPlanDataUri) {
+        promptParts.push(`平面图: {{media url=${input.floorPlanDataUri}}}`);
+    }
+
+    promptParts.push(`产品库 (你必须从此列表里选择产品，产品属性描述均为中文，特别是要遵守【生态平台选择规则】和【智能开关选择规则】):\n${productsJson}`);
+    promptParts.push(`请根据以上所有信息，特别是用户的画像、核心需求和手写需求，并严格遵守所有规则，从提供的产品库中选择适合用户的智能家居产品。在选择时，请综合考虑用户的预算和需求。"room" 和 "reason" 字段必须使用中文。`);
+    promptParts.push(`你的回复必须是一个符合以下 ProductSelectionOutputSchema 格式的 JSON 对象，不能包含任何额外的解释或 markdown 格式。\n最终 JSON 对象结构示例:\n{ "selectedItems": [ { "product_id": "1001", "quantity": 1, "room": "客厅", "reason": "中央控制中心" } ] }`);
+
+    const prompt = promptParts.join('\n\n');
     
     console.log('[流程步骤] 3/7: 正在调用 AI 进行产品选择...');
-    const { output: parsedSelection } = await selectionPrompt(promptInput);
+    const response = await ai.generate({
+        model: process.env.AI_MODEL_NAME,
+        prompt: prompt,
+        output: {
+          format: 'json',
+          schema: ProductSelectionOutputSchema,
+        },
+    });
+
+    const parsedSelection = response.output();
     
     if (!parsedSelection) {
         throw new Error('AI 返回了空的产品选择内容。');

@@ -10,7 +10,6 @@
  */
 
 import { ai } from '@/ai/genkit';
-import { openAI } from '@genkit-ai/compat-oai/openai';
 import { z } from 'zod';
 
 const GenerateAnalysisReportInputSchema = z.object({
@@ -35,40 +34,6 @@ const GenerateAnalysisReportOutputSchema = z.object({
 });
 export type GenerateAnalysisReportOutput = z.infer<typeof GenerateAnalysisReportOutputSchema>;
 
-
-const reportPrompt = ai.definePrompt({
-    name: 'generateAnalysisReportPrompt',
-    input: { schema: GenerateAnalysisReportInputSchema },
-    output: { schema: GenerateAnalysisReportOutputSchema },
-    config: {
-        model: openAI.model(process.env.AI_MODEL_NAME!),
-    },
-    prompt: `You are a smart home consultant who provides an analysis report based on the user's smart home plan.
-
-  The user has a property with an area of {{area}} sqm and a {{layout}} layout.
-  The selected budget tier is '{{budgetLevel}}'.
-  The total price of the selected items is: {{totalPrice}}.
-  The user's custom needs are: "{{customNeeds}}".
-
-  Here are the selected items that form the plan:
-  {{#each selectedItems}}
-  - Product ID: {{product_id}}, Quantity: {{quantity}}, Room: {{room}}, Reason: {{reason}}
-  {{/each}}
-
-  Please write a concise analysis report in Chinese, using markdown format. The report should cover these four points:
-  1.  **方案价值**: 简单说明与非智能家居相比，这个方案实现了哪些核心的自动化功能 (例如: 自动照明, 定时窗帘等)?
-  2.  **预算权衡**: 基于预算等级，哪些更高级的功能或产品体验打了折扣?
-  3.  **升级建议**: 如果预算更充足，可以从哪些方面进行升级，可以推荐具体产品品类?
-  4.  **省钱技巧**: 有哪些可以节省成本的替代方案或技巧?
-
-  IMPORTANT:
-  - Your entire response must be a single JSON object.
-  - The JSON object must have one key: "analysisReport".
-  - The value of "analysisReport" must be a markdown string containing the report.
-  - Do not add any introductory or concluding text outside of the markdown report itself.
-  `
-});
-
 const generateAnalysisReportFlow = ai.defineFlow(
   {
     name: 'generateAnalysisReportFlow',
@@ -80,7 +45,44 @@ const generateAnalysisReportFlow = ai.defineFlow(
     if (!process.env.AI_MODEL_NAME) {
       throw new Error("AI_MODEL_NAME 环境变量未设置。");
     }
-    const { output } = await reportPrompt(input);
+
+    const selectedItemsText = input.selectedItems.map(item => 
+        `- Product ID: ${item.product_id}, Quantity: ${item.quantity}, Room: ${item.room}, Reason: ${item.reason}`
+    ).join('\n');
+
+    const prompt = `You are a smart home consultant who provides an analysis report based on the user's smart home plan.
+
+The user has a property with an area of ${input.area} sqm and a ${input.layout} layout.
+The selected budget tier is '${input.budgetLevel}'.
+The total price of the selected items is: ${input.totalPrice}.
+The user's custom needs are: "${input.customNeeds}".
+
+Here are the selected items that form the plan:
+${selectedItemsText}
+
+Please write a concise analysis report in Chinese, using markdown format. The report should cover these four points:
+1.  **方案价值**: 简单说明与非智能家居相比，这个方案实现了哪些核心的自动化功能 (例如: 自动照明, 定时窗帘等)?
+2.  **预算权衡**: 基于预算等级，哪些更高级的功能或产品体验打了折扣?
+3.  **升级建议**: 如果预算更充足，可以从哪些方面进行升级，可以推荐具体产品品类?
+4.  **省钱技巧**: 有哪些可以节省成本的替代方案或技巧?
+
+IMPORTANT:
+- Your entire response must be a single JSON object.
+- The JSON object must have one key: "analysisReport".
+- The value of "analysisReport" must be a markdown string containing the report.
+- Do not add any introductory or concluding text outside of the markdown report itself.
+`;
+
+    const response = await ai.generate({
+      model: process.env.AI_MODEL_NAME,
+      prompt: prompt,
+      output: {
+        format: 'json',
+        schema: GenerateAnalysisReportOutputSchema,
+      },
+    });
+    
+    const output = response.output();
     if (!output) {
       console.error("[解析错误] AI分析报告返回了空内容。");
       throw new Error('AI returned an empty response for analysis report.');
