@@ -234,7 +234,7 @@ ${productsJson}
     
     console.log('[流程步骤] 3/7: 正在调用 AI 进行产品选择...');
     const productSelectionResponse = await openai.chat.completions.create({
-        model: process.env.AI_MODEL_NAME || 'Qwen/Qwen3-VL-8B-Instruct',
+        model: process.env.AI_MODEL_NAME!,
         messages: messages,
         temperature: 0.5,
         response_format: { type: 'json_object' },
