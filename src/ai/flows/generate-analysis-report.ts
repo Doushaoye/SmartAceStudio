@@ -41,9 +41,7 @@ const reportPrompt = ai.definePrompt({
     input: { schema: GenerateAnalysisReportInputSchema },
     output: { schema: GenerateAnalysisReportOutputSchema },
     config: {
-        model: (process.env.GEMINI_API_KEY && process.env.AI_MODEL_NAME?.startsWith('gemini'))
-            ? process.env.AI_MODEL_NAME
-            : openAI.model(process.env.AI_MODEL_NAME!),
+        model: openAI.model(process.env.AI_MODEL_NAME!),
     },
     prompt: `You are a smart home consultant who provides an analysis report based on the user's smart home plan.
 

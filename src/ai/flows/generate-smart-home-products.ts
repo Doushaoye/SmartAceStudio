@@ -128,9 +128,7 @@ const selectionPrompt = ai.definePrompt({
     }) },
     output: { schema: ProductSelectionOutputSchema },
     config: {
-        model: (process.env.GEMINI_API_KEY && process.env.AI_MODEL_NAME?.startsWith('gemini'))
-            ? process.env.AI_MODEL_NAME
-            : openAI.model(process.env.AI_MODEL_NAME!),
+        model: openAI.model(process.env.AI_MODEL_NAME!),
     },
     prompt: `你是一位AI智能家居顾问。请分析用户的房产信息、预算和需求，推荐一份智能家居产品清单。请使用中文进行回复。
 
