@@ -5,24 +5,22 @@ import { useRouter } from 'next/navigation';
 import { useProposal } from '@/context/proposal-context';
 import { ResultDashboard } from '@/components/result/result-dashboard';
 import { ContactSection } from '@/components/contact-section';
+import { LoadingAnimation } from '@/components/plan/loading-animation';
 
 export default function ResultPage() {
   const { proposal, isLoading } = useProposal();
   const router = useRouter();
 
   useEffect(() => {
+    // If loading is finished and there's still no proposal, redirect to plan page.
     if (!isLoading && !proposal) {
       router.replace('/plan');
     }
   }, [proposal, isLoading, router]);
 
   if (isLoading || !proposal) {
-    // Or a loading spinner
-    return (
-        <div className="flex items-center justify-center h-full">
-            {/* Can show a skeleton loader here */}
-        </div>
-    );
+    // Show loading animation while waiting for the proposal
+    return <LoadingAnimation />;
   }
 
   return (

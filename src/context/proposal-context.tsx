@@ -27,6 +27,7 @@ export function ProposalProvider({ children }: { children: ReactNode }) {
     setIsLoading(true);
     setError(null);
     setProposal(null);
+    router.push('/result');
 
     const result = await generateProposalAction(formData);
     
@@ -38,9 +39,9 @@ export function ProposalProvider({ children }: { children: ReactNode }) {
         title: "Error Generating Proposal",
         description: result.error,
       });
+      router.push('/plan');
     } else if (result.proposal) {
       setProposal(result.proposal);
-      router.push('/result');
     }
   }, [router, toast]);
   

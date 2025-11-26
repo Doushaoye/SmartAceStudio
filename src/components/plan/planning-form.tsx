@@ -13,7 +13,6 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { DollarSign, Zap, Gem, ArrowRight, FileUp, User, Heart, Baby, Accessibility, Cat, Download, Upload, FileText } from 'lucide-react';
 import { useI18n } from '@/context/i18n-context';
-import { LoadingAnimation } from './loading-animation';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
@@ -180,9 +179,6 @@ export function PlanningForm() {
     startProposalGeneration(formData);
   };
   
-  if (isLoading) {
-    return <LoadingAnimation />;
-  }
 
   return (
     <Card className="max-w-4xl mx-auto">
