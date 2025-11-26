@@ -10,6 +10,7 @@
  */
 
 import { ai } from '@/ai/genkit';
+import { googleAI } from '@genkit-ai/google-genai';
 import { z } from 'zod';
 
 const GenerateAnalysisReportInputSchema = z.object({
@@ -37,6 +38,7 @@ export type GenerateAnalysisReportOutput = z.infer<typeof GenerateAnalysisReport
 
 const reportPrompt = ai.definePrompt({
     name: 'generateAnalysisReportPrompt',
+    model: googleAI.model('gemini-1.5-flash-latest'),
     input: { schema: GenerateAnalysisReportInputSchema },
     output: { schema: GenerateAnalysisReportOutputSchema },
     prompt: `You are a smart home consultant who provides an analysis report based on the user's smart home plan.

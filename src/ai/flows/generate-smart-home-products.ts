@@ -7,6 +7,7 @@
  * - GenerateSmartHomeProductsInput - The input type for the function.
  */
 import { ai } from '@/ai/genkit';
+import { googleAI } from '@genkit-ai/google-genai';
 import { z } from 'zod';
 import { generateAnalysisReport } from './generate-analysis-report';
 import type { Product, EnrichedItem, Proposal } from '@/lib/products';
@@ -115,6 +116,7 @@ function toChineseKeys(product: any, isCustom: boolean) {
 
 const selectionPrompt = ai.definePrompt({
     name: 'generateSmartHomeProductsPrompt',
+    model: googleAI.model('gemini-1.5-flash-latest'),
     input: { schema: z.object({
         area: z.number(),
         layout: z.string(),
