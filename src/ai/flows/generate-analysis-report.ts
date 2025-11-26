@@ -9,14 +9,8 @@
  * - GenerateAnalysisReportOutput - The return type for the generateAnalysisReport function.
  */
 
+import { ai } from '@/ai/genkit';
 import { z } from 'zod';
-import OpenAI from 'openai';
-
-const openai = new OpenAI({
-  apiKey: process.env.SILICONFLOW_API_KEY,
-  baseURL: 'https://api.siliconflow.cn/v1',
-});
-
 
 const GenerateAnalysisReportInputSchema = z.object({
   budgetLevel: z.enum(['economy', 'premium', 'luxury']).describe('The budget tier selected by the user.'),
@@ -40,20 +34,22 @@ const GenerateAnalysisReportOutputSchema = z.object({
 });
 export type GenerateAnalysisReportOutput = z.infer<typeof GenerateAnalysisReportOutputSchema>;
 
-export async function generateAnalysisReport(input: GenerateAnalysisReportInput): Promise<GenerateAnalysisReportOutput> {
-  const selectedItemsString = input.selectedItems.map(item => 
-    `- Product ID: ${item.product_id}, Quantity: ${item.quantity}, Room: ${item.room}, Reason: ${item.reason}`
-  ).join('\n');
 
-  const prompt = `You are a smart home consultant who provides an analysis report based on the user's smart home plan.
+const reportPrompt = ai.definePrompt({
+    name: 'generateAnalysisReportPrompt',
+    input: { schema: GenerateAnalysisReportInputSchema },
+    output: { schema: GenerateAnalysisReportOutputSchema },
+    prompt: `You are a smart home consultant who provides an analysis report based on the user's smart home plan.
 
-  The user has a property with an area of ${input.area} sqm and a ${input.layout} layout.
-  The selected budget tier is '${input.budgetLevel}'.
-  The total price of the selected items is: ${input.totalPrice}.
-  The user's custom needs are: "${input.customNeeds}".
+  The user has a property with an area of {{area}} sqm and a {{layout}} layout.
+  The selected budget tier is '{{budgetLevel}}'.
+  The total price of the selected items is: {{totalPrice}}.
+  The user's custom needs are: "{{customNeeds}}".
 
   Here are the selected items that form the plan:
-  ${selectedItemsString}
+  {{#each selectedItems}}
+  - Product ID: {{product_id}}, Quantity: {{quantity}}, Room: {{room}}, Reason: {{reason}}
+  {{/each}}
 
   Please write a concise analysis report in Chinese, using markdown format. The report should cover these four points:
   1.  **方案价值**: 简单说明与非智能家居相比，这个方案实现了哪些核心的自动化功能 (例如: 自动照明, 定时窗帘等)?
@@ -66,26 +62,27 @@ export async function generateAnalysisReport(input: GenerateAnalysisReportInput)
   - The JSON object must have one key: "analysisReport".
   - The value of "analysisReport" must be a markdown string containing the report.
   - Do not add any introductory or concluding text outside of the markdown report itself.
-  `;
+  `
+});
 
-  const response = await openai.chat.completions.create({
-    model: process.env.AI_MODEL_NAME!,
-    messages: [{ role: 'user', content: prompt }],
-    response_format: { type: 'json_object' },
-    temperature: 0.5,
-  });
-
-  const content = response.choices[0].message.content;
-  if (!content) {
-    throw new Error('AI returned an empty response for analysis report.');
+const generateAnalysisReportFlow = ai.defineFlow(
+  {
+    name: 'generateAnalysisReportFlow',
+    inputSchema: GenerateAnalysisReportInputSchema,
+    outputSchema: GenerateAnalysisReportOutputSchema,
+  },
+  async (input) => {
+    console.log('[流程步骤] 6/7: 正在调用 AI 生成分析报告...');
+    const { output } = await reportPrompt(input);
+    if (!output) {
+      console.error("[解析错误] AI分析报告返回了空内容。");
+      throw new Error('AI returned an empty response for analysis report.');
+    }
+    console.log("[流程步骤] 6.5/7: 成功收到分析报告AI响应。");
+    return output;
   }
+);
 
-  try {
-    const parsedJson = JSON.parse(content);
-    return GenerateAnalysisReportOutputSchema.parse(parsedJson);
-  } catch (error) {
-    console.error("[解析错误] AI分析报告返回的JSON格式无效:", content);
-    console.error(error);
-    throw new Error('AI returned invalid JSON format for analysis report.');
-  }
+export async function generateAnalysisReport(input: GenerateAnalysisReportInput): Promise<GenerateAnalysisReportOutput> {
+  return await generateAnalysisReportFlow(input);
 }

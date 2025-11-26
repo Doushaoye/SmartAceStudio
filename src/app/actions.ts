@@ -1,10 +1,7 @@
 'use server';
 
-import type { Proposal, Product } from '@/lib/products';
+import type { Proposal } from '@/lib/products';
 import { generateSmartHomeProducts } from '@/ai/flows/generate-smart-home-products';
-import crypto from 'crypto';
-import Papa from 'papaparse';
-
 
 export async function generateProposalAction(
   formData: FormData
