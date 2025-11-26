@@ -7,6 +7,7 @@
  * - GenerateSmartHomeProductsInput - The input type for the function.
  */
 import { ai } from '@/ai/genkit';
+import { openAI } from '@genkit-ai/compat-oai/openai';
 import { z } from 'zod';
 import { generateAnalysisReport } from './generate-analysis-report';
 import type { Product, EnrichedItem, Proposal } from '@/lib/products';
@@ -127,7 +128,9 @@ const selectionPrompt = ai.definePrompt({
     }) },
     output: { schema: ProductSelectionOutputSchema },
     config: {
-        model: process.env.AI_MODEL_NAME,
+        model: (process.env.GEMINI_API_KEY && process.env.AI_MODEL_NAME?.startsWith('gemini'))
+            ? process.env.AI_MODEL_NAME
+            : openAI.model(process.env.AI_MODEL_NAME!),
     },
     prompt: `你是一位AI智能家居顾问。请分析用户的房产信息、预算和需求，推荐一份智能家居产品清单。请使用中文进行回复。
 
@@ -198,9 +201,9 @@ const generateSmartHomeProductsFlow = ai.defineFlow(
         throw new Error("AI_MODEL_NAME 环境变量未设置。");
     }
     
-    if (process.env.SILICONFLOW_API_KEY && !process.env.AI_MODEL_NAME.startsWith('gemini')) {
+    if (process.env.SILICONFLOW_API_KEY && !process.env.AI_MODEL_NAME?.startsWith('gemini')) {
         console.log('[配置检查] 检测到 SiliconFlow API 密钥，将使用 OpenAI 兼容模式。');
-    } else if (process.env.GEMINI_API_KEY && process.env.AI_MODEL_NAME.startsWith('gemini')) {
+    } else if (process.env.GEMINI_API_KEY && process.env.AI_MODEL_NAME?.startsWith('gemini')) {
         console.log('[配置检查] 检测到 Gemini API 密钥，将使用 Google AI 模式。');
     } else {
         throw new Error('缺少有效的 AI 服务配置。请检查 .env 文件中的 API 密钥和模型名称。');

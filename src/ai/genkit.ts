@@ -1,3 +1,5 @@
+'use server';
+
 import {genkit, Plugin} from 'genkit';
 import {googleAI} from '@genkit-ai/google-genai';
 import { openAI } from '@genkit-ai/compat-oai/openai';
@@ -12,15 +14,16 @@ if (process.env.GEMINI_API_KEY) {
 }
 
 if (process.env.SILICONFLOW_API_KEY) {
-  const siliconFlow = openAI({
-      name: `custom/${process.env.AI_MODEL_NAME}`,
+  plugins.push(openAI({
+      name: 'siliconflow', // a unique name for the plugin
       apiKey: process.env.SILICONFLOW_API_KEY,
       baseURL: process.env.SILICONFLOW_BASE_URL,
-  });
-  plugins.push(siliconFlow);
+  }));
 }
 
 
 export const ai = genkit({
   plugins,
+  logLevel: 'debug',
+  enableTracingAndMetrics: true,
 });
